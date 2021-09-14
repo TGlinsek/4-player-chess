@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>4-player chess</title>
+    <style>
+        #plošča {
+            border: 1px solid black;
+            width: 50%;
+            height: 50%;
+            margin: auto; 
+        }
+    </style>
+</head>
+<body>
+    <table id="plošča"></table>
+
+    <script>
+        var štVrstic = 8;
+        var štStolpcev = 8;
+        var plošča = document.getElementById("plošča");
+
+        for (var i = 0; i < štVrstic; i++) {
+            var novaVrsta = document.createElement("tr");
+            // novaVrsta.style.border = "1px solid black";
+
+            // plošča.appendChild(novaVrsta);
+            for (var j = 0; j < štStolpcev; j++) {
+                {
+                    var novProstorček = document.createElement("td");
+                    // novProstorček.textContent = "test";
+                    novProstorček.style.border = "1px solid black";
+                    
+                    {
+                        var novDiv = document.createElement("div");
+                        novDiv.style.position = "relative";
+                        novDiv.style.top = "0";
+                        novDiv.style.left = "0";
+                        novDiv.style.textAlign = "center";
+                        novDiv.style.width = "100%";
+
+                        {
+                            var novImg = document.createElement("img");
+                            novImg.src = "";
+                            novImg.alt = "Test";
+                            novImg.width = "50";  // namest string lahk damo tut kr int
+                            // 100 zapolni kar cel div, tk da tega ne rabimo spreminjat (nism zihr, a to tk deluje)
+                        }
+
+                        novDiv.appendChild(novImg);
+                    }
+                    novProstorček.appendChild(novDiv);
+                }
+
+                novaVrsta.appendChild(novProstorček);
+            }
+            plošča.appendChild(novaVrsta);  // lahko pred ali za tem prejšnjim for loopom
+        }
+    </script>
+</body>
+</html>
