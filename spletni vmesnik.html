@@ -15,11 +15,24 @@
 <body>
     <table id="plošča"></table>
 
+    <button id="gumb">Testni gumb</button>
+
+
+    <script src="igra.js"></script>
     <script>
+        var igra = new Igra();
         var štVrstic = 8;
         var štStolpcev = 8;
-        var plošča = document.getElementById("plošča");
 
+        var posodobiPloščo = function() {
+            var vsaPolja = document.getElementsByClassName("polje");
+            for (var i = 0; i < vsaPolja.length; i++) {
+                vsaPolja[i].textContent = igra.plošča[parseInt(i / štStolpcev)][i % štStolpcev];
+            }
+        }
+    </script>
+    <script>
+        var plošča = document.getElementById("plošča");
         for (var i = 0; i < štVrstic; i++) {
             var novaVrsta = document.createElement("tr");
             // novaVrsta.style.border = "1px solid black";
@@ -40,14 +53,22 @@
                         novDiv.style.width = "100%";
 
                         {
+                            var novStrong = document.createElement("strong");
+                            novStrong.className = "polje";
+                            var novImgTekst = document.createTextNode("K");
+                            novStrong.appendChild(novImgTekst);
+                            
+
+                            /*
                             var novImg = document.createElement("img");
                             novImg.src = "";
                             novImg.alt = "Test";
                             novImg.width = "50";  // namest string lahk damo tut kr int
                             // 100 zapolni kar cel div, tk da tega ne rabimo spreminjat (nism zihr, a to tk deluje)
+                            */
                         }
-
-                        novDiv.appendChild(novImg);
+                        // novDiv.appendChild(novImg);
+                        novDiv.appendChild(novStrong);
                     }
                     novProstorček.appendChild(novDiv);
                 }
@@ -55,7 +76,9 @@
                 novaVrsta.appendChild(novProstorček);
             }
             plošča.appendChild(novaVrsta);  // lahko pred ali za tem prejšnjim for loopom
-        }
+        }  // window.sessionStorage
+        var gumb = document.getElementById("gumb");
+        gumb.addEventListener("click", posodobiPloščo);
     </script>
 </body>
 </html>
