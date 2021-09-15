@@ -11,26 +11,37 @@ var potezaKmetaVeljavna = function(xPremik, yPremik, smerniVektor, zbijanje) {  
     // smerNeba: N, S, W, ali E
     // zbijanje: bool, ki pove, a kmet zbija
     // zaenkrat ignoriramo premikanje za dva polja in pa en passant
-
+    
     if (!zbijanje) {
-        return (xPremik, yPremik) === smerniVektor;
+        var a, b;
+        [a, b] = smerniVektor;
+        return a === xPremik && b === yPremik;
+        // return [xPremik, yPremik] === smerniVektor;
     } else {
         var seznam = [];
         switch(smerniVektor) {
-            case (0, -1):
-                seznam = [(-1, -1), (1, -1)];
+            case [0, -1]:
+                seznam = [[-1, -1], [1, -1]];
                 break;
-            case (0, 1):
-                seznam = [(-1, 1), (1, 1)];
+            case [0, 1]:
+                seznam = [[-1, 1], [1, 1]];
                 break;
-            case (-1, 0):
-                seznam = [(-1, -1), (-1, 1)];
+            case [-1, 0]:
+                seznam = [[-1, -1], [-1, 1]];
                 break;
-            case (1, 0):
-                seznam = [(1, -1), (1, 1)];
+            case [1, 0]:
+                seznam = [[1, -1], [1, 1]];
                 break;
         }
-        return seznam.includes((xPremik, yPremik));
+        // return seznam.includes([xPremik, yPremik]);
+        for (var i = 0; i < seznam.length; i++) {
+            var a, b;
+            [a, b] = seznam[i];
+            if (a === xPremik && b === yPremik) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -44,10 +55,10 @@ var Igra = function(plošča) {
     }
 
     this.smerniVektorji = {
-        "N" : (0, -1),
-        "S" : (0, 1),
-        "W" : (-1, 0),
-        "E" : (1, 0)
+        "N" : [0, -1],
+        "S" : [0, 1],
+        "W" : [-1, 0],
+        "E" : [1, 0]
     }
 
     this.plošča = [
@@ -76,9 +87,8 @@ var Igra = function(plošča) {
     this.končnoPolje = null;
 
     this.poltrakJeProstInVeljaven = function(x1, y1, x2, y2) {  // za poltrak se šteje vsaka izmed 8 glavnih smeri: 4 smeri neba in 4 diagonale
-        if (abs(x1 - x2) !== abs(y1 - y2) && x1 !== x2 && y1 !== y2) return false;  // to sploh ni poltrak
-        
-        for (var i = 1; i < Math.max(abs(x2 - x1), abs(y2 - y2)); i++) {
+        if (Math.abs(x1 - x2) !== Math.abs(y1 - y2) && x1 !== x2 && y1 !== y2) return false;  // to sploh ni poltrak
+        for (var i = 1; i < Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)); i++) {
             if ("EE" !== this.vrniPolje(x1 + i * Math.sign(x2 - x1), y1 + i * Math.sign(y2 - y1))) {
                 return false;
             }
@@ -107,7 +117,7 @@ var Igra = function(plošča) {
             for (var j = -1; j <= 1; j += 2) {
                 var k = 1;
 
-                i_, j_ = (i !== j) * i, (i === j) * j;
+                var i_ = (i !== j) * i, j_ = (i === j) * j;
                 /*
                 (1, -1) -> (1, 0)
                 (-1, 1) -> (-1, 0)
@@ -149,8 +159,8 @@ var Igra = function(plošča) {
                 if (meja[1] === String(this.igralecNaVrsti)) {  // svojih kmetov ne upoštevamo
                     continue;
                 }
-                var smer = this.smeri(parseInt(meja[1]));
-                if (meja[0] === "P" && [(-i, 0), (0, -j)].includes(this.smerniVektorji[smer])) {  // če (i, j) vektor iz (x, y) do (x + i, y + j), potem sta vektorja (-i, 0) in (0, -j) ravno ta vektorja, da te kmet s to smerjo premikanja lahko zbije
+                var smer = this.smeri[parseInt(meja[1])];
+                if (meja[0] === "P" && [[-i, 0], [0, -j]].includes(this.smerniVektorji[smer])) {  // če (i, j) vektor iz (x, y) do (x + i, y + j), potem sta vektorja (-i, 0) in (0, -j) ravno ta vektorja, da te kmet s to smerjo premikanja lahko zbije
                     return true;
                 }
             }
@@ -170,25 +180,25 @@ var Igra = function(plošča) {
 
         switch(izhodišče[0]) {
             case "R":  // ignoriramo ro(k/š)ado
-                return (x1 === x2 || y1 === y2) && poltrakJeProstInVeljaven(x1, y1, x2, y2);
+                return (x1 === x2 || y1 === y2) && this.poltrakJeProstInVeljaven(x1, y1, x2, y2);
                 break;
             case "V":
-                return x1 !== x2 && y1 !== y2 && abs(x1 - x2) + abs(y1 - y2) === 3;
+                return x1 !== x2 && y1 !== y2 && Math.abs(x1 - x2) + Math.abs(y1 - y2) === 3;
                 break;
             case "L":
-                return abs(x2 - x1) === abs(y2 - y1) && poltrakJeProstInVeljaven(x1, y1, x2, y2);
+                return Math.abs(x2 - x1) === Math.abs(y2 - y1) && this.poltrakJeProstInVeljaven(x1, y1, x2, y2);
                 break;
             case "Q":
-                return poltrakJeProstInVeljaven(x1, y1, x2, y2);
+                return this.poltrakJeProstInVeljaven(x1, y1, x2, y2);
                 break;
             case "K":
-                return max(abs(x1 - x2), abs(y1 - y2)) === 1 && !nasprotnikVidiToPolje(x2, y2);
+                return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)) === 1 && !this.nasprotnikVidiToPolje(x2, y2);
                 break;
             case "P":
                 return potezaKmetaVeljavna(x2 - x1, y2 - y1, this.smerniVektorji[this.smeri[this.igralecNaVrsti]], cilj !== "EE");
                 break;
             case "A":
-                return (x1 !== x2 && y1 !== y2 && abs(x1 - x2) + abs(y1 - y2) === 3) || poltrakJeProstInVeljaven(x1, y1, x2, y2);
+                return (x1 !== x2 && y1 !== y2 && Math.abs(x1 - x2) + Math.abs(y1 - y2) === 3) || this.poltrakJeProstInVeljaven(x1, y1, x2, y2);
                 break;
             default:
               throw "To se ne bi smelo zgoditi.";
@@ -197,10 +207,11 @@ var Igra = function(plošča) {
 
     this.premakni = function(x1, y1, x2, y2) {
         if (!this.premikJeMožen(x1, y1, x2, y2)) {
-            throw "Ta premik ni možen";
+            return false;
         }
         this.plošča[y2][x2] = this.plošča[y1][x1];
         this.plošča[y1][x1] = "EE";
+        return true;
     }
 
     /*

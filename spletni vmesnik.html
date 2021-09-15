@@ -39,39 +39,69 @@
         var vrniMouseDownCallBackFunkcijo = function(x, y) {
             return function(e) {
                 igra.končnoPolje = null;  // resetiramo
-                igra.začetnoPolje = (x, y);
+                if (igra.začetnoPolje === null) {  // v primeru, da smo nekako dvakrat sprožili mousedown, brez da bi sprožili mouseup
+                    igra.začetnoPolje = [x, y];
+                }  // če začetnoPolje ni null, ga ne spreminjamo (lahk bi ga tut, sam je uporabniku tkle boljš)
+                else {  // nočemo novega (še ta drugega) premikajočega elementa ustvarjati, zato vse pobrišemo in returnamo
+                    var premikajočiElementi = document.getElementsByClassName("slediMiški");
+                    for (var i = 0; i < premikajočiElementi.length; i++) {
+                        premikajočiElementi[i].remove();
+                    }
+                    return;
+                }
+                var novStrong1 = document.createElement("strong");
+                novStrong1.className = "slediMiški";
+                var novImgTekst1 = document.createTextNode(igra.vrniPolje(x, y));
+                novStrong1.appendChild(novImgTekst1);
+                novStrong1.style.pointerEvents = "none";
+                novStrong1.style.position = "absolute";
+                novStrong1.style.top = e.clientY - 7 + "px";
+                novStrong1.style.left = e.clientX - 7 + "px";
+                // novStrong1.style.alignContent = "center";
+                document.body.appendChild(novStrong1);
 
-                var novStrong = document.createElement("strong");
-                novStrong.className = "slediMiški";
-                var novImgTekst = document.createTextNode(igra.vrniPolje(x, y));
-                novStrong.appendChild(novImgTekst);
-                novStrong.style.position = "absolute";
-                novStrong.style.top = String(parseInt(e.clientY) - 7) + "px";
-                novStrong.style.left = String(parseInt(e.clientX) - 7) + "px";
-                // novStrong.style.alignContent = "center";
-                document.body.appendChild(novStrong);
+                var opozorila = document.getElementsByClassName("opozorilo");
+                for (var i = 0; i < opozorila.length; i++) {
+                    opozorila[i].remove();
+                    // opozorila[i].remove(opozorila[i]);  // tudi deluje
+                    // opozorila[i].parentNode.removeChild(opozorila[i]);  // tudi deluje
+                }
             };
         };
 
         var vrniMouseUpCallBackFunkcijo = function(x, y) {
             return function(e) {
-                igra.končnoPolje = (x, y);
+                igra.končnoPolje = [x, y];
                 if (igra.začetnoPolje !== null) {
-                    igra.premakni(igra.začetnoPolje[0], igra.začetnoPolje[1], igra.končnoPolje[0], igra.končnoPolje[1]);
-                    posodobiPloščo();
-
+                    var jeBilaPotezaOpravljena = igra.premakni(igra.začetnoPolje[0], igra.začetnoPolje[1], igra.končnoPolje[0], igra.končnoPolje[1]);
+                    if (!jeBilaPotezaOpravljena) {
+                        var tekst = document.createElement("p");  // če bi class nastavili na tekst (torej, če damo tu createTextNode), potem ne moremo teksta več pobrisati, ker to ni html element (nima html taga)
+                        tekst.textContent = "Poteza ni mogoča!";
+                        tekst.className = "opozorilo";
+                        document.body.appendChild(tekst);
+                    }
+                    else {
+                        posodobiPloščo();
+                    }
+                    /*  // mislim da bi tu moglo delat, če pa ne, potem pa sigurno dela zunaj tega if stavka
                     var premikajočiElementi = document.getElementsByClassName("slediMiški");
                     for (var i = 0; i < premikajočiElementi.length; i++) {
                         premikajočiElementi[i].remove();
                     }
+                    */
                 }
+                /*
+                var premikajočiElementi = document.getElementsByClassName("slediMiški");
+                for (var i = 0; i < premikajočiElementi.length; i++) {
+                    premikajočiElementi[i].remove();
+                }
+                */
                 igra.začetnoPolje = null;
             };
         };
 
         var premikMiške = function(e) {
             var premikajočiElementi = document.getElementsByClassName("slediMiški");
-            console.log(premikajočiElementi.length);
             if (premikajočiElementi.length > 1) {
                 throw "Napaka!";
             }
@@ -80,11 +110,19 @@
             }
             var premikajočiElement = premikajočiElementi[0];
 
-            premikajočiElement.style.top = String(parseInt(e.clientY) - 7) + "px";
-            premikajočiElement.style.left = String(parseInt(e.clientX) - 7) + "px";
+            premikajočiElement.style.top = e.clientY - 7 + "px";
+            premikajočiElement.style.left = e.clientX - 7 + "px";
         };
 
+        var spustMiške = function() {
+            var premikajočiElementi = document.getElementsByClassName("slediMiški");
+            for (var i = 0; i < premikajočiElementi.length; i++) {
+                premikajočiElementi[i].remove();
+            }
+        }
+
         document.body.addEventListener("mousemove", premikMiške);
+        document.body.addEventListener("mouseup", spustMiške);
     </script>
     <script>
         var plošča = document.getElementById("plošča");
