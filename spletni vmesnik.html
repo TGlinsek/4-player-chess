@@ -27,6 +27,7 @@
         var igra = new Igra();
         var štVrstic = 8;
         var štStolpcev = 8;
+        var animacija = false;
 
         var posodobiPloščo = function() {
             var vsaPolja = document.getElementsByClassName("polje");
@@ -38,6 +39,8 @@
         // mouseDown se kliče le takrat ko pritisnemo dol, ne pa skos ko držimo gumb
         var vrniMouseDownCallBackFunkcijo = function(x, y) {
             return function(e) {
+                if (animacija) return;
+
                 igra.končnoPolje = null;  // resetiramo
                 if (igra.začetnoPolje === null) {  // v primeru, da smo nekako dvakrat sprožili mousedown, brez da bi sprožili mouseup
                     igra.začetnoPolje = [x, y];
@@ -71,17 +74,56 @@
 
         var vrniMouseUpCallBackFunkcijo = function(x, y) {
             return function(e) {
+                if (animacija) return;
+
                 igra.končnoPolje = [x, y];
                 if (igra.začetnoPolje !== null) {
-                    var jeBilaPotezaOpravljena = igra.premakni(igra.začetnoPolje[0], igra.začetnoPolje[1], igra.končnoPolje[0], igra.končnoPolje[1]);
-                    if (!jeBilaPotezaOpravljena) {
+                    var boPotezaOpravljena = igra.premikJeMožen(igra.začetnoPolje[0], igra.začetnoPolje[1], igra.končnoPolje[0], igra.končnoPolje[1]);
+                    if (!boPotezaOpravljena) {
                         var tekst = document.createElement("p");  // če bi class nastavili na tekst (torej, če damo tu createTextNode), potem ne moremo teksta več pobrisati, ker to ni html element (nima html taga)
                         tekst.textContent = "Poteza ni mogoča!";
                         tekst.className = "opozorilo";
                         document.body.appendChild(tekst);
                     }
                     else {
-                        posodobiPloščo();
+                        animacija = true;
+
+                        var novStrong2 = document.createElement("strong");
+                        novStrong2.className = "animacija";
+                        var novImgTekst2 = document.createTextNode(igra.vrniPolje(igra.začetnoPolje[0], igra.začetnoPolje[1]));
+                        novStrong2.appendChild(novImgTekst2);
+                        novStrong2.style.pointerEvents = "none";
+                        novStrong2.style.position = "absolute";
+
+                        var elZačetni = document.getElementById(String(igra.začetnoPolje[0]) + "_" + String(igra.začetnoPolje[1]));
+                        var elKončni = document.getElementById(String(x) + "_" + String(y));
+                        
+                        var pravokotnikZačetni = elZačetni.getBoundingClientRect();
+                        var pravokotnikKončni = elKončni.getBoundingClientRect();
+
+                        novStrong2.style.left = pravokotnikZačetni.x + "px";
+                        novStrong2.style.top = pravokotnikZačetni.y + "px";
+
+                        novStrong2.style.transition = "top 1s, left 1s";
+                        document.body.appendChild(novStrong2);
+                        
+                        var placeholder = [igra.začetnoPolje[0], igra.začetnoPolje[1]];
+                        
+                        /* 
+                        Iz nekega razloga ima igra na tem mestu začetnoPolje null, če pogledamo v konzolo 
+                        console.log(igra);
+                        Toda če napišemo console.log(igra.začetnoPolje); potem pa ni null.
+                        */
+                        window.setTimeout(function(){
+                            // console.log(igra.začetnoPolje); // to tukaj sprinta null, iz nekega razloga
+                            novStrong2.style.left = pravokotnikKončni.x + "px";
+                            novStrong2.style.top = pravokotnikKončni.y + "px";
+                        }, 5);
+                        window.setTimeout(function(){
+                            igra.premakni(placeholder[0], placeholder[1], igra.končnoPolje[0], igra.končnoPolje[1]);
+                            posodobiPloščo();
+                            animacija = false;
+                        }, 1005);
                     }
                     /*  // mislim da bi tu moglo delat, če pa ne, potem pa sigurno dela zunaj tega if stavka
                     var premikajočiElementi = document.getElementsByClassName("slediMiški");
@@ -148,6 +190,7 @@
                         {
                             var novStrong = document.createElement("strong");
                             novStrong.className = "polje";
+                            novStrong.id = j + "_" + i;
                             novStrong.onmousedown = vrniMouseDownCallBackFunkcijo(j, i);
                             novStrong.onmouseup = vrniMouseUpCallBackFunkcijo(j, i);
                             var novImgTekst = document.createTextNode("K");

@@ -207,11 +207,10 @@ var Igra = function(plošča) {
 
     this.premakni = function(x1, y1, x2, y2) {
         if (!this.premikJeMožen(x1, y1, x2, y2)) {
-            return false;
+            throw "Napaka";
         }
         this.plošča[y2][x2] = this.plošča[y1][x1];
         this.plošča[y1][x1] = "EE";
-        return true;
     }
 
     /*
