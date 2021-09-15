@@ -8,19 +8,30 @@
             border: 1px solid black;
             width: 50%;
             height: 50%;
-            margin: auto; 
+            margin: auto;
+            border-collapse: collapse;
         }
 
         .polje:hover {
             border: 1px solid red;
         }
+        /*
+        ::selection {
+            background-color: transparent;
+        }  tega ne bomo rabli, rešitev z '.neizberljiv' je boljša
+        */
+        .neizberljiv { /* https://stackoverflow.com/questions/69430/is-there-a-way-to-make-text-unselectable-on-an-html-page */
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
     </style>
 </head>
 <body>
     <table id="plošča"></table>
-
-    <button id="gumb">Testni gumb</button>
-
 
     <script src="igra.js"></script>
     <script>
@@ -36,7 +47,7 @@
             }
         };
 
-        // mouseDown se kliče le takrat ko pritisnemo dol, ne pa skos ko držimo gumb
+        // mouseDown se kliče le takrat ko pritisnemo dol, ne pa skos ko držimo gumb (oz. karkoli že pač držimo)
         var vrniMouseDownCallBackFunkcijo = function(x, y) {
             return function(e) {
                 if (animacija) return;
@@ -52,17 +63,19 @@
                     }
                     return;
                 }
-                var novStrong1 = document.createElement("strong");
-                novStrong1.className = "slediMiški";
-                var novImgTekst1 = document.createTextNode(igra.vrniPolje(x, y));
-                novStrong1.appendChild(novImgTekst1);
-                novStrong1.style.pointerEvents = "none";
-                novStrong1.style.position = "absolute";
-                novStrong1.style.top = e.clientY - 7 + "px";
-                novStrong1.style.left = e.clientX - 7 + "px";
-                // novStrong1.style.alignContent = "center";
-                document.body.appendChild(novStrong1);
-
+                if (!["EE", "XX"].includes(igra.vrniPolje(x, y)) && igra.vrniPolje(x, y)[1] === String(igra.igralecNaVrsti)) {  // premikamo lahko le svoje figure, zato se tista majhna slikica pojavi le takrat
+                    var novStrong1 = document.createElement("strong");
+                    novStrong1.className = "slediMiški";
+                    var novImgTekst1 = document.createTextNode(igra.vrniPolje(x, y));
+                    novStrong1.appendChild(novImgTekst1);
+                    novStrong1.style.opacity = 0.7;
+                    novStrong1.style.pointerEvents = "none";
+                    novStrong1.style.position = "absolute";
+                    novStrong1.style.top = e.clientY - 7 + "px";
+                    novStrong1.style.left = e.clientX - 7 + "px";
+                    // novStrong1.style.alignContent = "center";
+                    document.body.appendChild(novStrong1);
+                }
                 var opozorila = document.getElementsByClassName("opozorilo");
                 for (var i = 0; i < opozorila.length; i++) {
                     opozorila[i].remove();
@@ -89,7 +102,7 @@
                         animacija = true;
 
                         var novStrong2 = document.createElement("strong");
-                        novStrong2.className = "animacija";
+                        // novStrong2.className = "animacija";
                         var novImgTekst2 = document.createTextNode(igra.vrniPolje(igra.začetnoPolje[0], igra.začetnoPolje[1]));
                         novStrong2.appendChild(novImgTekst2);
                         novStrong2.style.pointerEvents = "none";
@@ -98,9 +111,10 @@
                         var elZačetni = document.getElementById(String(igra.začetnoPolje[0]) + "_" + String(igra.začetnoPolje[1]));
                         var elKončni = document.getElementById(String(x) + "_" + String(y));
                         
-                        var pravokotnikZačetni = elZačetni.getBoundingClientRect();
+                        var pravokotnikZačetni = elZačetni.getBoundingClientRect();  // vrne objekt "pravokotnik", ki vsebuje informacije o koordinatah objekta
                         var pravokotnikKončni = elKončni.getBoundingClientRect();
 
+                        novStrong2.style.opacity = "0.5";
                         novStrong2.style.left = pravokotnikZačetni.x + "px";
                         novStrong2.style.top = pravokotnikZačetni.y + "px";
 
@@ -120,10 +134,11 @@
                             novStrong2.style.top = pravokotnikKončni.y + "px";
                         }, 5);
                         window.setTimeout(function(){
+                            novStrong2.remove();
                             igra.premakni(placeholder[0], placeholder[1], igra.končnoPolje[0], igra.končnoPolje[1]);
                             posodobiPloščo();
                             animacija = false;
-                        }, 1005);
+                        }, 1005);  // 1000 + 5
                     }
                     /*  // mislim da bi tu moglo delat, če pa ne, potem pa sigurno dela zunaj tega if stavka
                     var premikajočiElementi = document.getElementsByClassName("slediMiški");
@@ -171,6 +186,7 @@
         for (var i = 0; i < štVrstic; i++) {
             var novaVrsta = document.createElement("tr");
             // novaVrsta.style.border = "1px solid black";
+            novaVrsta.className = "neizberljiv";
 
             // plošča.appendChild(novaVrsta);
             for (var j = 0; j < štStolpcev; j++) {
@@ -214,9 +230,7 @@
                 novaVrsta.appendChild(novProstorček);
             }
             plošča.appendChild(novaVrsta);  // lahko pred ali za tem prejšnjim for loopom
-        }  // window.sessionStorage
-        var gumb = document.getElementById("gumb");
-        gumb.addEventListener("click", posodobiPloščo);
+        }
         posodobiPloščo();
     </script>
 </body>
