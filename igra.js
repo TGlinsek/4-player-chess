@@ -1,20 +1,39 @@
 var vrniIgralca = function(string) {  // vrne 1, če prvi igralec, oz. 2, če drugi igralec, drugače vrne 0, če prazno polje, če pa skala, pa vrne -1
     if (["1", "2"].includes(string[1])) return parseInt(string[1]);
-    if (string[1] == "X") return -1;
+    if (string[1] === "X") return -1;
     return 0;
 }
 
-/*
-var potezaKmetaVeljavna = function(xPremik, yPremik, smerNeba, zbijanje) {  // vrne true, če je veljavna
+
+var potezaKmetaVeljavna = function(xPremik, yPremik, smerniVektor, zbijanje) {  // vrne true, če je veljavna
     // xPremik je vektor x smeri: x2 - x1
     // yPremik je vektor y smeri: y2 - y2
     // smerNeba: N, S, W, ali E
     // zbijanje: bool, ki pove, a kmet zbija
     // zaenkrat ignoriramo premikanje za dva polja in pa en passant
 
-
+    if (!zbijanje) {
+        return (xPremik, yPremik) === smerniVektor;
+    } else {
+        var seznam = [];
+        switch(smerniVektor) {
+            case (0, -1):
+                seznam = [(-1, -1), (1, -1)];
+                break;
+            case (0, 1):
+                seznam = [(-1, 1), (1, 1)];
+                break;
+            case (-1, 0):
+                seznam = [(-1, -1), (-1, 1)];
+                break;
+            case (1, 0):
+                seznam = [(1, -1), (1, 1)];
+                break;
+        }
+        return seznam.includes((xPremik, yPremik));
+    }
 }
-*/
+
 
 var Igra = function(plošča) {
     this.igralecNaVrsti = 1;  // 1, 2, 3, ali 4
@@ -52,6 +71,9 @@ var Igra = function(plošča) {
         return this.plošča[y][x];
     }
 
+    // za mouse evente:
+    this.začetnoPolje = null;
+    this.končnoPolje = null;
 
     this.poltrakJeProstInVeljaven = function(x1, y1, x2, y2) {  // za poltrak se šteje vsaka izmed 8 glavnih smeri: 4 smeri neba in 4 diagonale
         if (abs(x1 - x2) !== abs(y1 - y2) && x1 !== x2 && y1 !== y2) return false;  // to sploh ni poltrak
@@ -100,7 +122,7 @@ var Igra = function(plošča) {
                 if (meja === "XX") {
                     continue;
                 }
-                if (meja[1] !== String(this.igralecNaVrsti) && (["R", "Q", "A"].includes(meja[0]) || (k == 1 && meja[0] === "K"))) {
+                if (meja[1] !== String(this.igralecNaVrsti) && (["R", "Q", "A"].includes(meja[0]) || (k === 1 && meja[0] === "K"))) {
                     return true;
                 }
             }
@@ -163,7 +185,7 @@ var Igra = function(plošča) {
                 return max(abs(x1 - x2), abs(y1 - y2)) === 1 && !nasprotnikVidiToPolje(x2, y2);
                 break;
             case "P":
-                return potezaKmetaVeljavna(x1 - x2, y1 - y2, this.smeri[this.igralecNaVrsti], cilj !== "EE");
+                return potezaKmetaVeljavna(x2 - x1, y2 - y1, this.smerniVektorji[this.smeri[this.igralecNaVrsti]], cilj !== "EE");
                 break;
             case "A":
                 return (x1 !== x2 && y1 !== y2 && abs(x1 - x2) + abs(y1 - y2) === 3) || poltrakJeProstInVeljaven(x1, y1, x2, y2);

@@ -10,6 +10,10 @@
             height: 50%;
             margin: auto; 
         }
+
+        .polje:hover {
+            border: 1px solid red;
+        }
     </style>
 </head>
 <body>
@@ -29,7 +33,58 @@
             for (var i = 0; i < vsaPolja.length; i++) {
                 vsaPolja[i].textContent = igra.plošča[parseInt(i / štStolpcev)][i % štStolpcev];
             }
-        }
+        };
+
+        // mouseDown se kliče le takrat ko pritisnemo dol, ne pa skos ko držimo gumb
+        var vrniMouseDownCallBackFunkcijo = function(x, y) {
+            return function(e) {
+                igra.končnoPolje = null;  // resetiramo
+                igra.začetnoPolje = (x, y);
+
+                var novStrong = document.createElement("strong");
+                novStrong.className = "slediMiški";
+                var novImgTekst = document.createTextNode(igra.vrniPolje(x, y));
+                novStrong.appendChild(novImgTekst);
+                novStrong.style.position = "absolute";
+                novStrong.style.top = String(parseInt(e.clientY) - 7) + "px";
+                novStrong.style.left = String(parseInt(e.clientX) - 7) + "px";
+                // novStrong.style.alignContent = "center";
+                document.body.appendChild(novStrong);
+            };
+        };
+
+        var vrniMouseUpCallBackFunkcijo = function(x, y) {
+            return function(e) {
+                igra.končnoPolje = (x, y);
+                if (igra.začetnoPolje !== null) {
+                    igra.premakni(igra.začetnoPolje[0], igra.začetnoPolje[1], igra.končnoPolje[0], igra.končnoPolje[1]);
+                    posodobiPloščo();
+
+                    var premikajočiElementi = document.getElementsByClassName("slediMiški");
+                    for (var i = 0; i < premikajočiElementi.length; i++) {
+                        premikajočiElementi[i].remove();
+                    }
+                }
+                igra.začetnoPolje = null;
+            };
+        };
+
+        var premikMiške = function(e) {
+            var premikajočiElementi = document.getElementsByClassName("slediMiški");
+            console.log(premikajočiElementi.length);
+            if (premikajočiElementi.length > 1) {
+                throw "Napaka!";
+            }
+            if (premikajočiElementi.length === 0) {
+                return;
+            }
+            var premikajočiElement = premikajočiElementi[0];
+
+            premikajočiElement.style.top = String(parseInt(e.clientY) - 7) + "px";
+            premikajočiElement.style.left = String(parseInt(e.clientX) - 7) + "px";
+        };
+
+        document.body.addEventListener("mousemove", premikMiške);
     </script>
     <script>
         var plošča = document.getElementById("plošča");
@@ -55,6 +110,8 @@
                         {
                             var novStrong = document.createElement("strong");
                             novStrong.className = "polje";
+                            novStrong.onmousedown = vrniMouseDownCallBackFunkcijo(j, i);
+                            novStrong.onmouseup = vrniMouseUpCallBackFunkcijo(j, i);
                             var novImgTekst = document.createTextNode("K");
                             novStrong.appendChild(novImgTekst);
                             
@@ -79,6 +136,7 @@
         }  // window.sessionStorage
         var gumb = document.getElementById("gumb");
         gumb.addEventListener("click", posodobiPloščo);
+        posodobiPloščo();
     </script>
 </body>
 </html>
