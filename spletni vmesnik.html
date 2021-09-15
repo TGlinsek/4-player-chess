@@ -20,13 +20,18 @@
             background-color: transparent;
         }  tega ne bomo rabli, rešitev z '.neizberljiv' je boljša
         */
-        .neizberljiv { /* https://stackoverflow.com/questions/69430/is-there-a-way-to-make-text-unselectable-on-an-html-page */
+        .neizberljiv {
             -moz-user-select: -moz-none;
             -khtml-user-select: none;
             -webkit-user-select: none;
             -ms-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
+        } /* https://stackoverflow.com/questions/69430/is-there-a-way-to-make-text-unselectable-on-an-html-page */
+
+        img {
+            pointer-events: none;
+            user-select: none;
         }
     </style>
 </head>
@@ -35,17 +40,55 @@
 
     <script src="igra.js"></script>
     <script>
+        var oznakaVSliko = function(niz) {  // niz dolžine 2
+            switch (niz[0]) {
+                case "E":
+                    return "praznina";
+                    break;
+                case "X":
+                    return "skala";
+                    break;
+                case "K":
+                    return "kralj";
+                    break;
+                case "Q":
+                    return "kraljica";
+                    break;
+                case "L":
+                    return "tekač";
+                    break;
+                case "V":
+                    return "konj";
+                    break;
+                case "R":
+                    return "trdnjava";
+                    break;
+                case "P":
+                    return "kmet";
+                    break;
+                case "A":
+                    return "konjica";
+                    break;
+            }
+        }
+    </script>
+    <script>
         var igra = new Igra();
         var štVrstic = 8;
         var štStolpcev = 8;
         var animacija = false;
+        var širinaSlik = "75";  // 100 je default
 
         var posodobiPloščo = function() {
             var vsaPolja = document.getElementsByClassName("polje");
             for (var i = 0; i < vsaPolja.length; i++) {
-                vsaPolja[i].textContent = igra.plošča[parseInt(i / štStolpcev)][i % štStolpcev];
+                // vsaPolja[i].textContent = igra.plošča[parseInt(i / štStolpcev)][i % štStolpcev];
+                vsaPolja[i].src = "slike\\" + oznakaVSliko(igra.plošča[parseInt(i / štStolpcev)][i % štStolpcev]) + ".png";
             }
         };
+
+        var pozicijaNovImg1X = 75/2;  // 75 je širina, torej vzamemo polovico, saj hočemo nacentrirati sliko
+        var pozicijaNovImg1Y = 75/2;  // –||– 
 
         // mouseDown se kliče le takrat ko pritisnemo dol, ne pa skos ko držimo gumb (oz. karkoli že pač držimo)
         var vrniMouseDownCallBackFunkcijo = function(x, y) {
@@ -64,17 +107,25 @@
                     return;
                 }
                 if (!["EE", "XX"].includes(igra.vrniPolje(x, y)) && igra.vrniPolje(x, y)[1] === String(igra.igralecNaVrsti)) {  // premikamo lahko le svoje figure, zato se tista majhna slikica pojavi le takrat
-                    var novStrong1 = document.createElement("strong");
-                    novStrong1.className = "slediMiški";
+                    var novImg1 = document.createElement("img");
+                    novImg1.className = "slediMiški neizberljiv";
+
+                    /*
                     var novImgTekst1 = document.createTextNode(igra.vrniPolje(x, y));
                     novStrong1.appendChild(novImgTekst1);
-                    novStrong1.style.opacity = 0.7;
-                    novStrong1.style.pointerEvents = "none";
-                    novStrong1.style.position = "absolute";
-                    novStrong1.style.top = e.clientY - 7 + "px";
-                    novStrong1.style.left = e.clientX - 7 + "px";
-                    // novStrong1.style.alignContent = "center";
-                    document.body.appendChild(novStrong1);
+                    */
+                    novImg1.width = širinaSlik;
+
+                    novImg1.src = "slike\\" + oznakaVSliko(igra.vrniPolje(x, y)) + ".png";
+                    novImg1.alt = "Test";
+
+                    novImg1.style.opacity = 0.7;
+                    novImg1.style.pointerEvents = "none";
+                    novImg1.style.position = "absolute";
+                    novImg1.style.top = e.clientY - pozicijaNovImg1Y + "px";
+                    novImg1.style.left = e.clientX - pozicijaNovImg1X + "px";
+                    // novImg1.style.alignContent = "center";
+                    document.body.appendChild(novImg1);
                 }
                 var opozorila = document.getElementsByClassName("opozorilo");
                 for (var i = 0; i < opozorila.length; i++) {
@@ -101,12 +152,20 @@
                     else {
                         animacija = true;
 
-                        var novStrong2 = document.createElement("strong");
-                        // novStrong2.className = "animacija";
+                        var novImg2 = document.createElement("img");
+                        // novImg2.className = "animacija";
+                        // novImg2.className = "neizberljiv";
+
+                        /*
                         var novImgTekst2 = document.createTextNode(igra.vrniPolje(igra.začetnoPolje[0], igra.začetnoPolje[1]));
                         novStrong2.appendChild(novImgTekst2);
-                        novStrong2.style.pointerEvents = "none";
-                        novStrong2.style.position = "absolute";
+                        */
+                        novImg2.src = "slike\\" + oznakaVSliko(igra.vrniPolje(igra.začetnoPolje[0], igra.začetnoPolje[1])) + ".png";
+                        novImg2.alt = "Test";
+
+                        novImg2.width = širinaSlik;
+                        novImg2.style.pointerEvents = "none";
+                        novImg2.style.position = "absolute";
 
                         var elZačetni = document.getElementById(String(igra.začetnoPolje[0]) + "_" + String(igra.začetnoPolje[1]));
                         var elKončni = document.getElementById(String(x) + "_" + String(y));
@@ -114,12 +173,12 @@
                         var pravokotnikZačetni = elZačetni.getBoundingClientRect();  // vrne objekt "pravokotnik", ki vsebuje informacije o koordinatah objekta
                         var pravokotnikKončni = elKončni.getBoundingClientRect();
 
-                        novStrong2.style.opacity = "0.5";
-                        novStrong2.style.left = pravokotnikZačetni.x + "px";
-                        novStrong2.style.top = pravokotnikZačetni.y + "px";
+                        novImg2.style.opacity = "0.5";
+                        novImg2.style.left = pravokotnikZačetni.x + "px";
+                        novImg2.style.top = pravokotnikZačetni.y + "px";
 
-                        novStrong2.style.transition = "top 1s, left 1s";
-                        document.body.appendChild(novStrong2);
+                        novImg2.style.transition = "top 1s, left 1s";
+                        document.body.appendChild(novImg2);
                         
                         var placeholder = [igra.začetnoPolje[0], igra.začetnoPolje[1]];
                         
@@ -130,11 +189,11 @@
                         */
                         window.setTimeout(function(){
                             // console.log(igra.začetnoPolje); // to tukaj sprinta null, iz nekega razloga
-                            novStrong2.style.left = pravokotnikKončni.x + "px";
-                            novStrong2.style.top = pravokotnikKončni.y + "px";
+                            novImg2.style.left = pravokotnikKončni.x + "px";
+                            novImg2.style.top = pravokotnikKončni.y + "px";
                         }, 5);
                         window.setTimeout(function(){
-                            novStrong2.remove();
+                            novImg2.remove();
                             igra.premakni(placeholder[0], placeholder[1], igra.končnoPolje[0], igra.končnoPolje[1]);
                             posodobiPloščo();
                             animacija = false;
@@ -167,8 +226,8 @@
             }
             var premikajočiElement = premikajočiElementi[0];
 
-            premikajočiElement.style.top = e.clientY - 7 + "px";
-            premikajočiElement.style.left = e.clientX - 7 + "px";
+            premikajočiElement.style.top = e.clientY - pozicijaNovImg1Y + "px";
+            premikajočiElement.style.left = e.clientX - pozicijaNovImg1X + "px";
         };
 
         var spustMiške = function() {
@@ -186,7 +245,7 @@
         for (var i = 0; i < štVrstic; i++) {
             var novaVrsta = document.createElement("tr");
             // novaVrsta.style.border = "1px solid black";
-            novaVrsta.className = "neizberljiv";
+            // novaVrsta.className = "neizberljiv";  // tega verjetno ne bomo več rabli
 
             // plošča.appendChild(novaVrsta);
             for (var j = 0; j < štStolpcev; j++) {
@@ -197,6 +256,7 @@
                     
                     {
                         var novDiv = document.createElement("div");
+                        novDiv.className = "neizberljiv";
                         novDiv.style.position = "relative";
                         novDiv.style.top = "0";
                         novDiv.style.left = "0";
@@ -204,25 +264,35 @@
                         novDiv.style.width = "100%";
 
                         {
-                            var novStrong = document.createElement("strong");
-                            novStrong.className = "polje";
-                            novStrong.id = j + "_" + i;
-                            novStrong.onmousedown = vrniMouseDownCallBackFunkcijo(j, i);
-                            novStrong.onmouseup = vrniMouseUpCallBackFunkcijo(j, i);
-                            var novImgTekst = document.createTextNode("K");
-                            novStrong.appendChild(novImgTekst);
-                            
-
                             /*
-                            var novImg = document.createElement("img");
-                            novImg.src = "";
-                            novImg.alt = "Test";
-                            novImg.width = "50";  // namest string lahk damo tut kr int
-                            // 100 zapolni kar cel div, tk da tega ne rabimo spreminjat (nism zihr, a to tk deluje)
+                                var novStrong = document.createElement("strong");
+                                novStrong.className = "polje";
+                                novStrong.id = j + "_" + i;
+                                novStrong.onmousedown = vrniMouseDownCallBackFunkcijo(j, i);
+                                novStrong.onmouseup = vrniMouseUpCallBackFunkcijo(j, i);
+                                var novImgTekst = document.createTextNode("K");
+                                novStrong.appendChild(novImgTekst);
                             */
+
+                            
+                            var novImg = document.createElement("img");
+                            novImg.src = "";  // na začetku ne rabimo nč narisat, itak se bodo src-ji ustrezno nastavili na koncu
+                            novImg.alt = "Test";
+                            novImg.width = širinaSlik;  // namest string lahk damo tut kr int
+                            // 100 zapolni kar cel div, tk da tega ne rabimo spreminjat (nism zihr, a to tk deluje)
+                            novImg.className = "polje";
+                            // novImg.className += " neizberljiv";  // tega verjetno ne bomo rabli
+                            novImg.id = j + "_" + i;
+                            /*
+                            novImg.onmousedown = vrniMouseDownCallBackFunkcijo(j, i);
+                            novImg.onmouseup = vrniMouseUpCallBackFunkcijo(j, i);
+                            */
+                            // bolje je, da imamo slike neizberljive, potem pa vse mouse evente damo na div, ki to sliko obdaja
+                            // https://stackoverflow.com/questions/5983729/make-images-not-selectable
                         }
-                        // novDiv.appendChild(novImg);
-                        novDiv.appendChild(novStrong);
+                        novDiv.onmousedown = vrniMouseDownCallBackFunkcijo(j, i);
+                        novDiv.onmouseup = vrniMouseUpCallBackFunkcijo(j, i);
+                        novDiv.appendChild(novImg);
                     }
                     novProstorček.appendChild(novDiv);
                 }
