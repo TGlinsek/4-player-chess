@@ -1,4 +1,4 @@
-#
+# ustvari slike in jih shrani v imenik "slike"
 from PIL import Image, ImageDraw, ImageFont
 import os
 
@@ -35,127 +35,65 @@ def napiši(draw, tekst, barva, koordinate):
     draw.multiline_text(koordinate, tekst, fill=barva, font=unicode_font)  # prvi parameter je koordinata začetka teksta (levo zgoraj od teksta)
 
 
-def napiši_multiline(draw, tekst, barva):
-    draw.multiline_text((50, 50), tekst, fill=barva, font=unicode_font, align="center")  # lahko dodamo \n v tekst
+def napiši_multiline(draw, tekst, barva, koordinate):
+    draw.multiline_text(koordinate, tekst, fill=barva, font=unicode_font, align="center")  # lahko dodamo \n v tekst
 
 širinaSlike, višinaSlike = 100, 100
 
-# kralj
-out = Image.new("RGBA", (100, 100), (255, 0, 0, 0))
-draw = ImageDraw.Draw(out, mode="RGBA")
+besede = ["Kralj", "Kraljica", "Tekač", "Konj", "Trdnjava", "Kmet", "Konjica"]
 
-širinaTeksta, višinaTeksta = draw.textsize("Kralj", font=unicode_font)
-# širinaSlike, višinaSlike = out.size  # no, to bi lahk tut kr iz parametrov razbrali
+barveVImeBarve = {
+    (0, 0, 255, 128) : "modra",
+    (0, 255, 0, 128) : "zelena",
+    (255, 255, 0, 128) : "rumena",
+    (255, 0, 0, 128) : "rdeča"
+}
 
-# https://stackoverflow.com/questions/1970807/center-middle-align-text-with-pil
-koordinate = (
-    (širinaSlike - širinaTeksta)/2,
-    (višinaSlike - višinaTeksta)/2
-)
+barveVIgralca = {
+    (0, 0, 255, 128) : 1,
+    (0, 255, 0, 128) : 3,
+    (255, 255, 0, 128) : 2,
+    (255, 0, 0, 128) : 4
+}
 
-napiši(draw, "Kralj", (0, 0, 0), koordinate)
-ime = "kralj"
-shrani(ime, out)
+smeri = {
+    1 : "N",
+    3 : "E",
+    2 : "S",
+    4 : "W"
+}
 
+oznakeSmeri = {
+    "N" : "↑",
+    "E" : "→",
+    "S" : "↓",
+    "W" : "←"
+}
 
-# kraljica
-out = Image.new("RGBA", (100, 100), (255, 0, 0, 0))
-draw = ImageDraw.Draw(out, mode="RGBA")
+for ba in barveVIgralca.keys():
+    for be in besede:
+        out = Image.new("RGBA", (širinaSlike, višinaSlike), ba)
+        draw = ImageDraw.Draw(out, mode="RGBA")
 
-širinaTeksta, višinaTeksta = draw.textsize("Kraljica", font=unicode_font)
+        širinaTeksta, višinaTeksta = draw.textsize(be, font=unicode_font)
+        # širinaSlike, višinaSlike = out.size  # no, to bi lahk tut kr iz parametrov razbrali
 
-koordinate = (
-    (širinaSlike - širinaTeksta)/2,
-    (višinaSlike - višinaTeksta)/2
-)
+        # https://stackoverflow.com/questions/1970807/center-middle-align-text-with-pil
+        koordinate = (
+            (širinaSlike - širinaTeksta)/2,
+            (višinaSlike - višinaTeksta)/2
+        )
 
-napiši(draw, "Kraljica", (0, 0, 0), koordinate)
-ime = "kraljica"
-shrani(ime, out)
-
-
-# tekač
-out = Image.new("RGBA", (100, 100), (255, 0, 0, 0))
-draw = ImageDraw.Draw(out, mode="RGBA")
-
-širinaTeksta, višinaTeksta = draw.textsize("Tekač", font=unicode_font)
-
-koordinate = (
-    (širinaSlike - širinaTeksta)/2,
-    (višinaSlike - višinaTeksta)/2
-)
-
-napiši(draw, "Tekač", (0, 0, 0), koordinate)
-ime = "tekač"
-shrani(ime, out)
-
-
-# konj
-out = Image.new("RGBA", (100, 100), (255, 0, 0, 0))
-draw = ImageDraw.Draw(out, mode="RGBA")
-
-širinaTeksta, višinaTeksta = draw.textsize("Konj", font=unicode_font)
-
-koordinate = (
-    (širinaSlike - širinaTeksta)/2,
-    (višinaSlike - višinaTeksta)/2
-)
-
-napiši(draw, "Konj", (0, 0, 0), koordinate)
-ime = "konj"
-shrani(ime, out)
-
-
-# kralj
-out = Image.new("RGBA", (100, 100), (255, 0, 0, 0))
-draw = ImageDraw.Draw(out, mode="RGBA")
-
-širinaTeksta, višinaTeksta = draw.textsize("Trdnjava", font=unicode_font)
-
-koordinate = (
-    (širinaSlike - širinaTeksta)/2,
-    (višinaSlike - višinaTeksta)/2
-)
-
-napiši(draw, "Trdnjava", (0, 0, 0), koordinate)
-ime = "trdnjava"
-shrani(ime, out)
-
-
-# kralj
-out = Image.new("RGBA", (100, 100), (255, 0, 0, 0))
-draw = ImageDraw.Draw(out, mode="RGBA")
-
-širinaTeksta, višinaTeksta = draw.textsize("Kmet", font=unicode_font)
-
-koordinate = (
-    (širinaSlike - širinaTeksta)/2,
-    (višinaSlike - višinaTeksta)/2
-)
-
-napiši(draw, "Kmet", (0, 0, 0), koordinate)
-ime = "kmet"
-shrani(ime, out)
-
-
-# kralj
-out = Image.new("RGBA", (100, 100), (255, 0, 0, 0))
-draw = ImageDraw.Draw(out, mode="RGBA")
-
-širinaTeksta, višinaTeksta = draw.textsize("Konjica", font=unicode_font)
-
-koordinate = (
-    (širinaSlike - širinaTeksta)/2,
-    (višinaSlike - višinaTeksta)/2
-)
-
-napiši(draw, "Konjica", (0, 0, 0), koordinate)
-ime = "konjica"
-shrani(ime, out)
+        if be == "Kmet":
+            napiši_multiline(draw, be + "\n" + oznakeSmeri[smeri[barveVIgralca[ba]]], (0, 0, 0), koordinate)
+        else:
+            napiši(draw, be, (0, 0, 0), koordinate)
+        ime = be.lower() + "_" + barveVImeBarve[ba]
+        shrani(ime, out)
 
 
 # zid (skala)
-out = Image.new("RGBA", (100, 100), (255, 0, 0, 0))
+out = Image.new("RGBA", (100, 100), (255, 255, 255, 0))
 draw = ImageDraw.Draw(out, mode="RGBA")
 
 širinaTeksta, višinaTeksta = draw.textsize("Zid", font=unicode_font)
@@ -171,7 +109,7 @@ shrani(ime, out)
 
 
 # praznina
-out = Image.new("RGBA", (100, 100), (255, 0, 0, 0))
+out = Image.new("RGBA", (100, 100), (255, 255, 255, 0))
 
 ime = "praznina"
 shrani(ime, out)

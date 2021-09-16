@@ -71,6 +71,21 @@
                     break;
             }
         }
+        var igralecVBarvo = {
+            1 : "modra",
+            2 : "rumena",
+            3 : "zelena",
+            4 : "rdeča"
+        }
+        var oznakaVBarvo = function(niz) {
+            if (niz[1] === "E") {
+                return "";
+            } else if (niz[1] === "X") {
+                return "";
+            } else {
+                return "_" + igralecVBarvo[parseInt(niz[1])];
+            }
+        }
     </script>
     <script>
         var igra = new Igra();
@@ -82,13 +97,14 @@
         var posodobiPloščo = function() {
             var vsaPolja = document.getElementsByClassName("polje");
             for (var i = 0; i < vsaPolja.length; i++) {
+                oznaka = igra.plošča[parseInt(i / štStolpcev)][i % štStolpcev];
                 // vsaPolja[i].textContent = igra.plošča[parseInt(i / štStolpcev)][i % štStolpcev];
-                vsaPolja[i].src = "slike\\" + oznakaVSliko(igra.plošča[parseInt(i / štStolpcev)][i % štStolpcev]) + ".png";
+                vsaPolja[i].src = "slike\\" + oznakaVSliko(oznaka) + oznakaVBarvo(oznaka) + ".png";
             }
         };
 
         var pozicijaNovImg1X = 75/2;  // 75 je širina, torej vzamemo polovico, saj hočemo nacentrirati sliko
-        var pozicijaNovImg1Y = 75/2;  // –||– 
+        var pozicijaNovImg1Y = 75/2;  // –||–
 
         // mouseDown se kliče le takrat ko pritisnemo dol, ne pa skos ko držimo gumb (oz. karkoli že pač držimo)
         var vrniMouseDownCallBackFunkcijo = function(x, y) {
@@ -116,7 +132,8 @@
                     */
                     novImg1.width = širinaSlik;
 
-                    novImg1.src = "slike\\" + oznakaVSliko(igra.vrniPolje(x, y)) + ".png";
+                    oznaka = igra.vrniPolje(x, y);
+                    novImg1.src = "slike\\" + oznakaVSliko(oznaka) + oznakaVBarvo(oznaka) + ".png";
                     novImg1.alt = "Test";
 
                     novImg1.style.opacity = 0.7;
@@ -160,7 +177,8 @@
                         var novImgTekst2 = document.createTextNode(igra.vrniPolje(igra.začetnoPolje[0], igra.začetnoPolje[1]));
                         novStrong2.appendChild(novImgTekst2);
                         */
-                        novImg2.src = "slike\\" + oznakaVSliko(igra.vrniPolje(igra.začetnoPolje[0], igra.začetnoPolje[1])) + ".png";
+                        oznaka = igra.vrniPolje(igra.začetnoPolje[0], igra.začetnoPolje[1]);
+                        novImg2.src = "slike\\" + oznakaVSliko(oznaka) + oznakaVBarvo(oznaka) + ".png";
                         novImg2.alt = "Test";
 
                         novImg2.width = širinaSlik;
