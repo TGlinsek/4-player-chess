@@ -1,5 +1,5 @@
-var vrniIgralca = function(string) {  // vrne 1, če prvi igralec, oz. 2, če drugi igralec, drugače vrne 0, če prazno polje, če pa skala, pa vrne -1
-    if (["1", "2"].includes(string[1])) return parseInt(string[1]);
+var vrniIgralca = function(string) {  // vrne 1, če prvi igralec, oz. 2, če drugi igralec, oz. ..., drugače vrne 0, če prazno polje, če pa skala, pa vrne -1
+    if (["1", "2", "3", "4"].includes(string[1])) return parseInt(string[1]);
     if (string[1] === "X") return -1;
     return 0;
 }
@@ -49,9 +49,21 @@ var potezaKmetaVeljavna = function(xPremik, yPremik, smerniVektor, zbijanje) {  
 var Igra = function(plošča) {
     this.igralecNaVrsti = 1;  // 1, 2, 3, ali 4
 
+    this.vrstniRedIgralcev = [1, 3, 2, 4];
+
+    this.pridobiNaslednjegaIgralca = function() {
+        trenutniIndeks = this.vrstniRedIgralcev.indexOf(this.igralecNaVrsti);
+        if (trenutniIndeks >= this.vrstniRedIgralcev.length - 1) {  // nikoli ne velja trenutniIndeks > this.vrstniRedIgralcev.length - 1, tako da bi lahko dali tudi enakost
+            return this.vrstniRedIgralcev[0];
+        }
+        return this.vrstniRedIgralcev[trenutniIndeks + 1];
+    };
+
     this.smeri = {
         1 : "N",  // igralec 1 gre navzgor
-        2 : "S"  // igralec 2 gre navzdol
+        2 : "S",  // igralec 2 gre navzdol
+        3 : "E",
+        4 : "W"
     }
 
     this.smerniVektorji = {
@@ -61,6 +73,7 @@ var Igra = function(plošča) {
         "E" : [1, 0]
     }
 
+    /*
     this.plošča = [
         ["R2", "V2", "L2", "Q2", "K2", "L2", "V2", "R2"],
         ["P2", "P2", "P2", "P2", "P2", "P2", "P2", "P2"],
@@ -71,6 +84,24 @@ var Igra = function(plošča) {
         ["P1", "P1", "P1", "P1", "P1", "P1", "P1", "P1"],
         ["R1", "V1", "L1", "Q1", "K1", "L1", "V1", "R1"]
     ];
+    */
+    
+    this.plošča = [
+        ["XX", "XX", "XX", "R2", "V2", "L2", "K2", "Q2", "L2", "V2", "R2", "XX", "XX", "XX"],
+        ["XX", "XX", "XX", "P2", "P2", "P2", "P2", "P2", "P2", "P2", "P2", "XX", "XX", "XX"],
+        ["XX", "XX", "XX", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "XX", "XX", "XX"],
+        ["R3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "R4"],
+        ["V3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "V4"],
+        ["L3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "L4"],
+        ["K3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "Q4"],
+        ["Q3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "K4"],
+        ["L3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "L4"],
+        ["V3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "V4"],
+        ["R3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "R4"],
+        ["XX", "XX", "XX", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "XX", "XX", "XX"],
+        ["XX", "XX", "XX", "P1", "P1", "P1", "P1", "P1", "P1", "P1", "P1", "XX", "XX", "XX"],
+        ["XX", "XX", "XX", "R1", "V1", "L1", "Q1", "K1", "L1", "V1", "R1", "XX", "XX", "XX"]
+    ]
 
 
     this.širina = this.plošča[0].length;
@@ -170,9 +201,10 @@ var Igra = function(plošča) {
 
 
     this.premikJeMožen = function(x1, y1, x2, y2) {  // x gre od 0 do 7, prav tako y
+        console.log(this.igralecNaVrsti);
+
         izhodišče = this.vrniPolje(x1, y1);
         cilj = this.vrniPolje(x2, y2);
-        
         if (vrniIgralca(izhodišče) !== this.igralecNaVrsti) return false;  // false, saj ne premikamo svoje figure, ampak figuro nekoga drugega
         if ([-1, this.igralecNaVrsti].includes(vrniIgralca(cilj))) return false;  // false, saj premikamo v skalo ali pa v svoje figure
 
@@ -211,6 +243,8 @@ var Igra = function(plošča) {
         }
         this.plošča[y2][x2] = this.plošča[y1][x1];
         this.plošča[y1][x1] = "EE";
+
+        this.igralecNaVrsti = this.pridobiNaslednjegaIgralca();
     }
 
     /*

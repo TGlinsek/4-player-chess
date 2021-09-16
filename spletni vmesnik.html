@@ -89,10 +89,10 @@
     </script>
     <script>
         var igra = new Igra();
-        var štVrstic = 8;
-        var štStolpcev = 8;
+        var štVrstic = 14;
+        var štStolpcev = 14;
         var animacija = false;
-        var širinaSlik = "75";  // 100 je default
+        var širinaSlik = "50";  // 100 je default
 
         var posodobiPloščo = function() {
             var vsaPolja = document.getElementsByClassName("polje");
@@ -103,8 +103,8 @@
             }
         };
 
-        var pozicijaNovImg1X = 75/2;  // 75 je širina, torej vzamemo polovico, saj hočemo nacentrirati sliko
-        var pozicijaNovImg1Y = 75/2;  // –||–
+        var pozicijaNovImg1X = 50/2;  // 50 je širina, torej vzamemo polovico, saj hočemo nacentrirati sliko
+        var pozicijaNovImg1Y = 50/2;  // –||–
 
         // mouseDown se kliče le takrat ko pritisnemo dol, ne pa skos ko držimo gumb (oz. karkoli že pač držimo)
         var vrniMouseDownCallBackFunkcijo = function(x, y) {
