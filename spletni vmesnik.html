@@ -20,6 +20,7 @@
             background-color: transparent;
         }  tega ne bomo rabli, rešitev z '.neizberljiv' je boljša
         */
+        
         .neizberljiv {
             -moz-user-select: -moz-none;
             -khtml-user-select: none;
@@ -33,6 +34,7 @@
             pointer-events: none;
             user-select: none;
         }
+        
     </style>
 </head>
 <body>
@@ -110,6 +112,7 @@
         var vrniMouseDownCallBackFunkcijo = function(x, y) {
             return function(e) {
                 if (animacija) return;
+                if (igra.prviPoraženec !== null) return;
 
                 igra.končnoPolje = null;  // resetiramo
                 if (igra.začetnoPolje === null) {  // v primeru, da smo nekako dvakrat sprožili mousedown, brez da bi sprožili mouseup
@@ -134,7 +137,7 @@
 
                     oznaka = igra.vrniPolje(x, y);
                     novImg1.src = "slike\\" + oznakaVSliko(oznaka) + oznakaVBarvo(oznaka) + ".png";
-                    novImg1.alt = "Test";
+                    novImg1.alt = oznaka;
 
                     novImg1.style.opacity = 0.7;
                     novImg1.style.pointerEvents = "none";
@@ -156,6 +159,7 @@
         var vrniMouseUpCallBackFunkcijo = function(x, y) {
             return function(e) {
                 if (animacija) return;
+                if (igra.prviPoraženec !== null) return;
 
                 igra.končnoPolje = [x, y];
                 if (igra.začetnoPolje !== null) {
@@ -179,7 +183,7 @@
                         */
                         oznaka = igra.vrniPolje(igra.začetnoPolje[0], igra.začetnoPolje[1]);
                         novImg2.src = "slike\\" + oznakaVSliko(oznaka) + oznakaVBarvo(oznaka) + ".png";
-                        novImg2.alt = "Test";
+                        novImg2.alt = oznaka;
 
                         novImg2.width = širinaSlik;
                         novImg2.style.pointerEvents = "none";
@@ -257,6 +261,15 @@
 
         document.body.addEventListener("mousemove", premikMiške);
         document.body.addEventListener("mouseup", spustMiške);
+    </script>
+    <script>
+        /*  // nekje drugje bomo morali napisati to obvestilo
+        if (igra.prviPoraženec !== null) {
+            var tekst = document.createElement("p");
+            tekst.textContent = "Igralec " + igra.prviPoraženec + " je izgubil!";
+            document.body.appendChild(tekst);
+        }
+        */
     </script>
     <script>
         var plošča = document.getElementById("plošča");
