@@ -94,7 +94,7 @@
         var štVrstic = 14;
         var štStolpcev = 14;
         var animacija = false;
-        var širinaSlik = "50";  // 100 je default
+        var širinaSlik = "100";  // 100 je default
 
         var posodobiPloščo = function() {
             var vsaPolja = document.getElementsByClassName("polje");
@@ -105,8 +105,13 @@
             }
         };
 
-        var pozicijaNovImg1X = 50/2;  // 50 je širina, torej vzamemo polovico, saj hočemo nacentrirati sliko
-        var pozicijaNovImg1Y = 50/2;  // –||–
+        /*
+        var pozicijaNovImg1X = 100/2;  // 100 je širina, torej vzamemo polovico, saj hočemo nacentrirati sliko
+        var pozicijaNovImg1Y = 100/2;  // –||–
+        */
+        var pozicijaNovImg1X = parseInt(širinaSlik)/2;
+        var pozicijaNovImg1Y = parseInt(širinaSlik)/2;  // oz. višina slik, ampak itak je kvadratno vse
+
 
         // mouseDown se kliče le takrat ko pritisnemo dol, ne pa skos ko držimo gumb (oz. karkoli že pač držimo)
         var vrniMouseDownCallBackFunkcijo = function(x, y) {
@@ -142,8 +147,10 @@
                     novImg1.style.opacity = 0.7;
                     novImg1.style.pointerEvents = "none";
                     novImg1.style.position = "absolute";
-                    novImg1.style.top = e.clientY - pozicijaNovImg1Y + "px";
-                    novImg1.style.left = e.clientX - pozicijaNovImg1X + "px";
+                    // console.log("mišY: " + e.pageY);
+                    // console.log("mišX: " + e.pageX);
+                    novImg1.style.top = e.pageY - pozicijaNovImg1Y + "px";
+                    novImg1.style.left = e.pageX - pozicijaNovImg1X + "px";
                     // novImg1.style.alignContent = "center";
                     document.body.appendChild(novImg1);
                 }
@@ -192,12 +199,24 @@
                         var elZačetni = document.getElementById(String(igra.začetnoPolje[0]) + "_" + String(igra.začetnoPolje[1]));
                         var elKončni = document.getElementById(String(x) + "_" + String(y));
                         
+                        /*
+                        {
+                            elZačetni.src = "";  // če tu damo to kodo, potem se bojo dimenzije elementa img spremenile, kar bo vplivalo na koordinate od pravokotnikZačetni
+                        }
+                        */
+
                         var pravokotnikZačetni = elZačetni.getBoundingClientRect();  // vrne objekt "pravokotnik", ki vsebuje informacije o koordinatah objekta
                         var pravokotnikKončni = elKončni.getBoundingClientRect();
 
+                        var prikazovanjePrejšnjePozicijeFigure = true;  // to lahko spreminjamo
+                        if (prikazovanjePrejšnjePozicijeFigure) {
+                            elZačetni.src = "";
+                        }
+
                         novImg2.style.opacity = "0.5";
-                        novImg2.style.left = pravokotnikZačetni.x + "px";
-                        novImg2.style.top = pravokotnikZačetni.y + "px";
+                        novImg2.style.left = pravokotnikZačetni.left + window.pageXOffset + "px";
+                        novImg2.style.top = pravokotnikZačetni.top + window.pageYOffset + "px";
+                        // https://javascript.info/coordinates
 
                         novImg2.style.transition = "top 1s, left 1s";
                         document.body.appendChild(novImg2);
@@ -211,8 +230,8 @@
                         */
                         window.setTimeout(function(){
                             // console.log(igra.začetnoPolje); // to tukaj sprinta null, iz nekega razloga
-                            novImg2.style.left = pravokotnikKončni.x + "px";
-                            novImg2.style.top = pravokotnikKončni.y + "px";
+                            novImg2.style.left = pravokotnikKončni.left + window.pageXOffset + "px";
+                            novImg2.style.top = pravokotnikKončni.top + window.pageYOffset + "px";
                         }, 5);
                         window.setTimeout(function(){
                             novImg2.remove();
@@ -248,8 +267,8 @@
             }
             var premikajočiElement = premikajočiElementi[0];
 
-            premikajočiElement.style.top = e.clientY - pozicijaNovImg1Y + "px";
-            premikajočiElement.style.left = e.clientX - pozicijaNovImg1X + "px";
+            premikajočiElement.style.top = e.pageY - pozicijaNovImg1Y + "px";
+            premikajočiElement.style.left = e.pageX - pozicijaNovImg1X + "px";
         };
 
         var spustMiške = function() {
@@ -277,13 +296,15 @@
             var novaVrsta = document.createElement("tr");
             // novaVrsta.style.border = "1px solid black";
             // novaVrsta.className = "neizberljiv";  // tega verjetno ne bomo več rabli
-
+            novaVrsta.height = "100px";
             // plošča.appendChild(novaVrsta);
             for (var j = 0; j < štStolpcev; j++) {
                 {
                     var novProstorček = document.createElement("td");
                     // novProstorček.textContent = "test";
                     novProstorček.style.border = "1px solid black";
+                    novProstorček.style.width = "200";
+                    novProstorček.style.height = "200";
                     
                     {
                         var novDiv = document.createElement("div");
@@ -292,8 +313,10 @@
                         novDiv.style.top = "0";
                         novDiv.style.left = "0";
                         novDiv.style.textAlign = "center";
-                        novDiv.style.width = "100%";
-
+                        // novDiv.style.width = "100%";
+                        // novDiv.style.height = "100%";  // to pomeni, da bo višina diva zavzela celoten prostorček tabele
+                        // novDiv.style.width = "120px";
+                        // novDiv.style.height = "120px";
                         {
                             /*
                                 var novStrong = document.createElement("strong");
@@ -307,10 +330,12 @@
 
                             
                             var novImg = document.createElement("img");
-                            novImg.src = "";  // na začetku ne rabimo nč narisat, itak se bodo src-ji ustrezno nastavili na koncu
-                            novImg.alt = "Test";
-                            novImg.width = širinaSlik;  // namest string lahk damo tut kr int
+                            // novImg.src = "";  // na začetku ne rabimo nč narisat, itak se bodo src-ji ustrezno nastavili na koncu
+                            // novImg.alt = "Test";
+                            // novImg.width = širinaSlik;  // namest string lahk damo tut kr int
                             // 100 zapolni kar cel div, tk da tega ne rabimo spreminjat (nism zihr, a to tk deluje)
+
+                            // novImg.style.width = "100px";
                             novImg.className = "polje";
                             // novImg.className += " neizberljiv";  // tega verjetno ne bomo rabli
                             novImg.id = j + "_" + i;
