@@ -22,42 +22,35 @@ var seznamVsebuje = function(sez, vsebovanec) {  // le če vsebovanec in vsi ele
     return false;
 }
 
-var potezaKmetaVeljavna = function(xPremik, yPremik, smerniVektor, zbijanje) {  // vrne true, če je veljavna
+var podvoji = function(seznam) {  // seznam dolžine 2, ki ima za elemente števila
+    var a, b;
+    [a, b] = seznam;
+    return [2 * a, 2 * b];
+}
+
+var seštej = function(sez1, sez2) {  // seznam dolžine 2, ki ima za elemente števila
+    var a, b;
+    [a, b] = sez1;
+    var c, d;
+    [c, d] = sez2;
+    return [a + c, b + d];
+}
+
+var potezaKmetaVeljavna = function(xPremik, yPremik, smerniVektor, zbijanje, kmetLahkoGreZaDva=false) {  // vrne true, če je veljavna
     // xPremik je vektor x smeri: x2 - x1
     // yPremik je vektor y smeri: y2 - y2
     // smerNeba: N, S, W, ali E
     // zbijanje: bool, ki pove, a kmet zbija
     // zaenkrat ignoriramo premikanje za dva polja in pa en passant
-    
+    // smerni vektor je enotski vektor
+
     // tukaj ne preverjamo, ali je poteza dejansko izvedljiva (recimo, da ni skala na poti), saj itak nimamo informacij o plošči
     if (!zbijanje) {
-        /*
-        var a, b;
-        [a, b] = smerniVektor;
-        return a === xPremik && b === yPremik;
-        */
-        // return [xPremik, yPremik] === smerniVektor;
+        if (kmetLahkoGreZaDva && 
+            seznamaStaEnaka([xPremik, yPremik], podvoji(smerniVektor))) return true;
         return seznamaStaEnaka([xPremik, yPremik], smerniVektor);
     } else {
         var seznam = [];
-        /* // switch statemente ne moremo 
-        switch(smerniVektor) {
-            case [0, -1]:
-                seznam = [[-1, -1], [1, -1]];
-                break;
-            case [0, 1]:
-                seznam = [[-1, 1], [1, 1]];
-                break;
-            case [-1, 0]:
-                seznam = [[-1, -1], [-1, 1]];
-                break;
-            case [1, 0]:
-                seznam = [[1, -1], [1, 1]];
-                break;
-            default:
-                break;
-        }
-        */
         if (seznamaStaEnaka(smerniVektor, [0, -1])) {
             seznam = [[-1, -1], [1, -1]];
         } else if (seznamaStaEnaka(smerniVektor, [0, 1])) {
@@ -70,23 +63,7 @@ var potezaKmetaVeljavna = function(xPremik, yPremik, smerniVektor, zbijanje) {  
             throw "Ta smer sploh ni veljavna!";
         }
 
-        // return seznam.includes([xPremik, yPremik]);
         return seznamVsebuje(seznam, [xPremik, yPremik]);
-        /*
-        for (var i = 0; i < seznam.length; i++) {
-            \*
-            var a, b;
-            [a, b] = seznam[i];
-            if (a === xPremik && b === yPremik) {
-                return true;
-            }
-            \*
-            if (seznamaStaEnaka([xPremik, yPremik], seznam[i])) {
-                return true;
-            }
-        }
-        return false;
-        */
     }
 }
 
@@ -506,10 +483,27 @@ var Igra = function(plošča) {
         return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)) === 1 && !igra3.nasprotnikVidiToPolje(x2, y2, lastnikKralja)[0];
     }
 
+    this.poljeJeTakšnoDaLahkoKmetiGrejoZaDvaNaprej = function(x, y, lastnikKmeta) {
+        // lastnik kmeta je torej število od 1 do 4
+        // return [1, 12].includes(y) || [1, 12].includes(x);  // lahko bi tudi vzeli presek [1, 12] in [x, y] in pogledali, ali je prazen
+        if (x === 1 && lastnikKmeta === 3) return true;  // leva
+        if (x === 12 && lastnikKmeta === 4) return true;  // desna
+        if (y === 1 && lastnikKmeta === 2) return true;  // gor
+        if (y === 12 && lastnikKmeta === 1) return true;  // dol
+        return false;
+    }
+
     this.kmetSeLahkoPremakne = function(x1, y1, x2, y2, lastnikKmeta=this.igralecNaVrsti) {
+        // console.log(cilj);  // že tu je cilj definiran in celo enak kot pa po naslednji vrstici. Ne vem pa, zakaj
+        var cilj = this.vrniPolje(x2, y2);  // te vrstice torej ne rabimo, ampak za preglednost je boljš
+        
         // tako navaden premik kot zbijanje je dovoljeno
         // predpostavljamo, da (x2, y2) ni zasedeno s prijateljsko figuro oz. s skalo, in da na (x1, y1) res kmet, in to ustreznega igralca. Tega ne bomo preverjali posebej
-        return potezaKmetaVeljavna(x2 - x1, y2 - y1, this.smerniVektorji[this.smeri[lastnikKmeta]], cilj !== "EE");  // tuki dejansko ne rabimo zamenjat this.igralecNaVrsti z neNasprotnik, ampak ni važno
+        var smer = this.smerniVektorji[this.smeri[lastnikKmeta]];  // tuki dejansko ne rabimo zamenjat this.igralecNaVrsti z neNasprotnik, ampak ni važno
+        return potezaKmetaVeljavna(x2 - x1, y2 - y1, smer, cilj !== "EE", 
+            this.poljeJeTakšnoDaLahkoKmetiGrejoZaDvaNaprej(x1, y1, lastnikKmeta) && // ali je polje ustrezno za kmetov dvojni korak naprej
+            this.vrniPolje(seštej([x1, y1], smer)[0], seštej([x1, y1], smer)[1]) === "EE"  // preverimo, da kmet, ki bi šel za dve polji naprej, ni preskočil kake figure ali pa skale
+        );
     }
 
     this.konjicaSeLahkoPremakne = function(x1, y1, x2, y2) {
