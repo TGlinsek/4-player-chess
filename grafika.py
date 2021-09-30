@@ -28,7 +28,7 @@ def shrani(destinacija, slika):  # brez končnice
     pot = destinacija + ".png"
     slika.save(pot)
 
-unicode_font = ImageFont.truetype(cwd1 + "\\dejavu-fonts-ttf-2.37\\ttf\\DejaVuSans.ttf", 20)
+unicode_font = ImageFont.truetype(cwd1 + "\\dejavu-fonts-ttf-2.37\\ttf\\DejaVuSans.ttf", 20)  # ta font si lahko naložimo na https://sourceforge.net/projects/dejavu/
 # unicode_font = None  # če hočemo default font, ampak potem se pri šumnikih sesuje
 
 def napiši(draw, tekst, barva, koordinate):
@@ -112,6 +112,16 @@ shrani(ime, out)
 out = Image.new("RGBA", (100, 100), (255, 255, 255, 0))
 
 ime = "praznina"
+shrani(ime, out)
+
+
+# pika
+out = Image.new("RGBA", (100, 100), (255, 255, 255, 0))
+draw = ImageDraw.Draw(out, mode="RGBA")
+
+draw.ellipse((35, 35, 65, 65), fill='black', outline='black')
+
+ime = "pika"
 shrani(ime, out)
 
 # za prikaz slike bi dali:

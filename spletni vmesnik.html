@@ -102,6 +102,7 @@
                 oznaka = igra.plošča[parseInt(i / štStolpcev)][i % štStolpcev];
                 // vsaPolja[i].textContent = igra.plošča[parseInt(i / štStolpcev)][i % štStolpcev];
                 vsaPolja[i].src = "slike\\" + oznakaVSliko(oznaka) + oznakaVBarvo(oznaka) + ".png";
+                vsaPolja[i].alt = oznaka;
             }
         };
 
@@ -124,41 +125,71 @@
                     igra.začetnoPolje = [x, y];
                 }  // če začetnoPolje ni null, ga ne spreminjamo (lahk bi ga tut, sam je uporabniku tkle boljš)
                 else {  // nočemo novega (še ta drugega) premikajočega elementa ustvarjati, zato vse pobrišemo in returnamo
-                    var premikajočiElementi = document.getElementsByClassName("slediMiški");
-                    for (var i = 0; i < premikajočiElementi.length; i++) {
-                        premikajočiElementi[i].remove();
-                    }
+                    spustMiške();
                     return;
                 }
                 if (!["EE", "XX"].includes(igra.vrniPolje(x, y)) && igra.vrniPolje(x, y)[1] === String(igra.igralecNaVrsti)) {  // premikamo lahko le svoje figure, zato se tista majhna slikica pojavi le takrat
-                    var novImg1 = document.createElement("img");
-                    novImg1.className = "slediMiški neizberljiv";
+                    {
+                        var novImg1 = document.createElement("img");
+                        novImg1.className = "slediMiški neizberljiv";
 
-                    /*
-                    var novImgTekst1 = document.createTextNode(igra.vrniPolje(x, y));
-                    novStrong1.appendChild(novImgTekst1);
-                    */
-                    novImg1.width = širinaSlik;
+                        /*
+                        var novImgTekst1 = document.createTextNode(igra.vrniPolje(x, y));
+                        novStrong1.appendChild(novImgTekst1);
+                        */
+                        novImg1.width = širinaSlik;
 
-                    oznaka = igra.vrniPolje(x, y);
-                    novImg1.src = "slike\\" + oznakaVSliko(oznaka) + oznakaVBarvo(oznaka) + ".png";
-                    novImg1.alt = oznaka;
+                        oznaka = igra.vrniPolje(x, y);
+                        novImg1.src = "slike\\" + oznakaVSliko(oznaka) + oznakaVBarvo(oznaka) + ".png";
+                        novImg1.alt = oznaka;
 
-                    novImg1.style.opacity = 0.7;
-                    novImg1.style.pointerEvents = "none";
-                    novImg1.style.position = "absolute";
-                    // console.log("mišY: " + e.pageY);
-                    // console.log("mišX: " + e.pageX);
-                    novImg1.style.top = e.pageY - pozicijaNovImg1Y + "px";
-                    novImg1.style.left = e.pageX - pozicijaNovImg1X + "px";
-                    // novImg1.style.alignContent = "center";
-                    document.body.appendChild(novImg1);
+                        novImg1.style.opacity = 0.7;
+                        novImg1.style.pointerEvents = "none";
+                        novImg1.style.position = "absolute";
+                        // console.log("mišY: " + e.pageY);
+                        // console.log("mišX: " + e.pageX);
+                        novImg1.style.top = e.pageY - pozicijaNovImg1Y + "px";
+                        novImg1.style.left = e.pageX - pozicijaNovImg1X + "px";
+                        // novImg1.style.alignContent = "center";
+                        document.body.appendChild(novImg1);
+                    }  // lebdeča slika
+                    for (var i = 0; i < štVrstic; i++) {
+                        for (var j = 0; j < štStolpcev; j++) {
+                            if (igra.premikJeMožen(x, y, j, i)) {  // premik iz (x, y) na (j, i)
+                                var pika = document.createElement("img");
+                                pika.className = "neizberljiv";  // morda to ni potrebno
+                                pika.className += " pika";  // ta class definiramo zato, da po spustu miške vse elemente v tem classu zbrišemo
+
+                                pika.width = širinaSlik;
+
+                                pika.src = "slike\\pika.png";
+                                pika.alt = "";  // ne bomo dodajali alta za piko
+
+                                pika.style.opacity = 0.2;
+                                pika.style.pointerEvents = "none";  // morda to ni potrebno
+
+                                pika.style.position = "absolute";
+
+                                var prostiElement = document.getElementById(j + "_" + i);  // polje, ki ga bomo označili (ga prekrili s piko)
+                                var pravokotnik = prostiElement.getBoundingClientRect();
+                                pika.style.top = pravokotnik.top + window.pageYOffset + "px";
+                                pika.style.left = pravokotnik.left + window.pageXOffset + "px";
+
+                                document.body.appendChild(pika);
+                            }
+                        }
+                    }  // označevanje ustreznih mest
                 }
                 var opozorila = document.getElementsByClassName("opozorilo");
+                /*
                 for (var i = 0; i < opozorila.length; i++) {
                     opozorila[i].remove();
                     // opozorila[i].remove(opozorila[i]);  // tudi deluje
                     // opozorila[i].parentNode.removeChild(opozorila[i]);  // tudi deluje
+                }
+                */
+                while (opozorila.length > 0) {
+                    opozorila[0].remove();
                 }
             };
         };
@@ -197,7 +228,7 @@
                         novImg2.style.position = "absolute";
 
                         var elZačetni = document.getElementById(String(igra.začetnoPolje[0]) + "_" + String(igra.začetnoPolje[1]));
-                        var elKončni = document.getElementById(String(x) + "_" + String(y));
+                        var elKončni = document.getElementById(String(x) + "_" + String(y));  // lahko tudi kar x + "_" + y, namesto String(x) + "_" + String(y)
                         
                         /*
                         {
@@ -210,7 +241,7 @@
 
                         var prikazovanjePrejšnjePozicijeFigure = true;  // to lahko spreminjamo
                         if (prikazovanjePrejšnjePozicijeFigure) {
-                            elZačetni.src = "";
+                            elZačetni.src = "slike\\praznina.png";  // bolje kar dati sem praznino, kot pa nastaviti src na "" (tj., nedefiniran src)
                         }
 
                         novImg2.style.opacity = "0.5";
@@ -240,19 +271,7 @@
                             animacija = false;
                         }, 1005);  // 1000 + 5
                     }
-                    /*  // mislim da bi tu moglo delat, če pa ne, potem pa sigurno dela zunaj tega if stavka
-                    var premikajočiElementi = document.getElementsByClassName("slediMiški");
-                    for (var i = 0; i < premikajočiElementi.length; i++) {
-                        premikajočiElementi[i].remove();
-                    }
-                    */
                 }
-                /*
-                var premikajočiElementi = document.getElementsByClassName("slediMiški");
-                for (var i = 0; i < premikajočiElementi.length; i++) {
-                    premikajočiElementi[i].remove();
-                }
-                */
                 igra.začetnoPolje = null;
             };
         };
@@ -273,10 +292,24 @@
 
         var spustMiške = function() {
             var premikajočiElementi = document.getElementsByClassName("slediMiški");
-            for (var i = 0; i < premikajočiElementi.length; i++) {
-                premikajočiElementi[i].remove();
+
+            while (premikajočiElementi.length > 0) {
+                premikajočiElementi[0].remove();
             }
+
+            var pike = document.getElementsByClassName("pika");
+            /*  // slabo, kr se pike.length spreminja med izvajanjem loopa
+            for (var i = 0; i < pike.length; i++) {
+                pike[i].remove();  // načeloma lahk tut pike[i].parentNode.removeChild(pike[i])
+            }
+            */
+            
+            while (pike.length > 0) {
+                pike[0].remove();
+            }
+            // https://stackoverflow.com/questions/4777077/removing-elements-by-class-name
         }
+
 
         document.body.addEventListener("mousemove", premikMiške);
         document.body.addEventListener("mouseup", spustMiške);
