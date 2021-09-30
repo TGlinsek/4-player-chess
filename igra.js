@@ -141,8 +141,8 @@ var Igra = function(plošča) {
         ["R3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "R4"],
         ["V3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "V4"],
         ["L3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "L4"],
-        ["K3", "P3", "EE", "EE", "EE", "EE", "A1", "A2", "EE", "EE", "EE", "EE", "P4", "Q4"],
-        ["Q3", "P3", "EE", "EE", "EE", "EE", "A3", "A4", "EE", "EE", "EE", "EE", "P4", "K4"],
+        ["K3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "Q4"],
+        ["Q3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "K4"],
         ["L3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "L4"],
         ["V3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "V4"],
         ["R3", "P3", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "EE", "P4", "R4"],
@@ -456,87 +456,10 @@ var Igra = function(plošča) {
 
     this.nasprotnikVidiToPolje = function(x, y, neNasprotnik=this.igralecNaVrsti) {  // torej, kralja ne moremo tja premakniti
         // vrne par: prvi element je bool (če je true, potem nasprotnik vidi to polje, drugače false), drugi element pa pove koordinate nasprotnikove figure, ki napada to polje
-        /*
-        for (var i = -1; i <= 1; i += 2) {
-            for (var j = -1; j <= 1; j += 2) {
-                var k = 1;
-                while (this.vrniPolje(x + k * i, y + k * j) === "EE") {
-                    k += 1;
-                }
-                var meja = this.vrniPolje(x + k * i, y + k * j);
-                if (meja === "XX") {
-                    continue;
-                }
-                if (meja[1] !== String(neNasprotnik) && (["L", "Q", "A"].includes(meja[0]) || (k === 1 && meja[0] === "K"))) {
-                    return [true, [x + k * i, y + k * j]];
-                }
-            }
-        }
-        */
         var sez1 = this.poljeJeNapadenoPoDiagonali(x, y, neNasprotnik);
-        /*
-        for (var i = -1; i <= 1; i += 2) {
-            for (var j = -1; j <= 1; j += 2) {
-                var k = 1;
-
-                var i_ = (i !== j) * i, j_ = (i === j) * j;
-                \*
-                (1, -1) -> (1, 0)
-                (-1, 1) -> (-1, 0)
-                (1, 1) -> (0, 1)
-                (-1, -1) -> (0, -1)
-                \*
-
-                while (this.vrniPolje(x + k * i_, y + k * j_) === "EE") {
-                    k += 1;
-                }
-                var meja = this.vrniPolje(x + k * i_, y + k * j_);
-                if (meja === "XX") {
-                    continue;
-                }
-                if (meja[1] !== String(neNasprotnik) && (["R", "Q", "A"].includes(meja[0]) || (k === 1 && meja[0] === "K"))) {
-                    return [true, [x + k * i_, y + k * j_]];
-                }
-            }
-        }
-        */
         var sez2 = this.poljeJeNapadenoPoRavniČrti(x, y, neNasprotnik);
-        /*
-        for (var i = -2; i <= 2; i += 4) {
-            for (var j = -1; j <= 1; j += 2) {
-                for (var k = 0; k <= 1; k++) {
-                    var meja = [this.vrniPolje(x + i, y + j), this.vrniPolje(x + j, y + i)][k];
-                    var koordMeje = [[x + i, y + j], [x + j, y + i]][k];
-                    if (["EE", "XX"].includes(meja)) {
-                        continue;
-                    }
-                    if (meja[1] !== String(neNasprotnik) && ["V", "A"].includes(meja[0])) {
-                        return [true, koordMeje];
-                    }
-                }
-            }
-        }
-        */
         var sez3 = this.poljeJeNapadenoPoKonje(x, y, neNasprotnik);
-        /*
-        for (var i = -1; i <= 1; i += 2) {
-            for (var j = -1; j <= 1; j += 2) {
-                var meja = this.vrniPolje(x + i, y + j);
-                if (["EE", "XX"].includes(meja)) {
-                    continue;
-                }
-                if (meja[1] === String(neNasprotnik)) {  // svojih kmetov ne upoštevamo
-                    continue;
-                }
-                var smer = this.smeri[parseInt(meja[1])];
-                if (meja[0] === "P" && seznamVsebuje([[-i, 0], [0, -j]], this.smerniVektorji[smer])) {  // če (i, j) vektor iz (x, y) do (x + i, y + j), potem sta vektorja (-i, 0) in (0, -j) ravno ta vektorja, da te kmet s to smerjo premikanja lahko zbije
-                    return [true, [x + i, y + j]];
-                }
-            }
-        }
-        */
         var sez4 = this.poljeJeNapadenoPrekoKmeta(x, y, neNasprotnik);
-        // return [false, null];
         return [...sez1, ...sez2, ...sez3, ...sez4];
     }
 
@@ -615,49 +538,24 @@ var Igra = function(plošča) {
         }
         switch(izhodišče[0]) {
             case "R":  // ignoriramo ro(k/š)ado
-                /*
-                return (x1 === x2 || y1 === y2) && this.poltrakJeProstInVeljaven(x1, y1, x2, y2);
-                */
                 return this.trdnjavaSeLahkoPremakne(x1, y1, x2, y2);
                 break;
             case "V":
-                /*
-                return x1 !== x2 && y1 !== y2 && Math.abs(x1 - x2) + Math.abs(y1 - y2) === 3;
-                */
                 return this.konjSeLahkoPremakne(x1, y1, x2, y2);
                 break;
             case "L":
-                /*
-                return Math.abs(x2 - x1) === Math.abs(y2 - y1) && this.poltrakJeProstInVeljaven(x1, y1, x2, y2);
-                */
                 return this.tekačSeLahkoPremakne(x1, y1, x2, y2);
                 break;
             case "Q":
-                /*
-                return this.poltrakJeProstInVeljaven(x1, y1, x2, y2);
-                */
                 return this.kraljicaSeLahkoPremakne(x1, y1, x2, y2);
                 break;
             case "K":
-                /*
-                var igra3 = new Igra();
-                // igra3.plošča = this.plošča.slice();  // plitka kopija
-                igra3.plošča = JSON.parse(JSON.stringify(this.plošča));  // globoka kopija
-                igra3.plošča[y1][x1] = "EE";  // kraljevo polje zamenjamo s praznim, zato da bo metoda "nasprotnikVidiToPolje" pravilno delovala (drugače bi lahko kralj zastiral pogled nasprotnikovih figur)
-                return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)) === 1 && !igra3.nasprotnikVidiToPolje(x2, y2, neNasprotnik)[0];
-                */
                 return this.kraljSeLahkoPremakne(x1, y1, x2, y2, neNasprotnik);
                 break;
             case "P":
-                /*
-                return potezaKmetaVeljavna(x2 - x1, y2 - y1, this.smerniVektorji[this.smeri[neNasprotnik]], cilj !== "EE");  // tuki dejansko ne rabimo zamenjat this.igralecNaVrsti z neNasprotnik, ampak ni važno
-                */
                 return this.kmetSeLahkoPremakne(x1, y1, x2, y2, neNasprotnik);
                 break;
             case "A":
-                /*
-                return (x1 !== x2 && y1 !== y2 && Math.abs(x1 - x2) + Math.abs(y1 - y2) === 3) || this.poltrakJeProstInVeljaven(x1, y1, x2, y2);
-                */
                 return this.konjicaSeLahkoPremakne(x1, y1, x2, y2);
                 break;
             default:
@@ -706,7 +604,7 @@ var Igra = function(plošča) {
                             if (koordinateNasprotnikov.length === 0) {
                                 continue zankaČezVseIgralce;  // pol itak ni šah
                             }
-                            
+                            console.log("Šah je za igralca " + this.vrstniRedIgralcev[k]);
                             if (koordinateNasprotnikov.length >= 2) {  // če sta napadalca vsaj dva, potem se šaha ne moremo znebiti s tem, da le nastavimo kako od svojih figur. V tem primeru torej ne potrebujemo nobenih simulacij
                                 break preprečevanjeŠaha;
                             }
@@ -772,7 +670,7 @@ var Igra = function(plošča) {
                             }
 
                         }
-                        console.log("Šah je za igralca " + this.vrstniRedIgralcev[k]);
+                        // na tem mestu je edina morebitna rešitev pred šahmatom to, da kralja umaknemo nekam
                         if (!this.šahiraniIgralci.includes(this.vrstniRedIgralcev[k])) {  // da ne dobimo dvojnih vrednosti
                             this.šahiraniIgralci.push(this.vrstniRedIgralcev[k]);
                         }
