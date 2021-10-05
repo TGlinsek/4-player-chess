@@ -38,7 +38,7 @@ var seštej = function(sez1, sez2) {  // seznam dolžine 2, ki ima za elemente �
 
 var potezaKmetaVeljavna = function(xPremik, yPremik, smerniVektor, zbijanje, kmetLahkoGreZaDva=false) {  // vrne true, če je veljavna
     // xPremik je vektor x smeri: x2 - x1
-    // yPremik je vektor y smeri: y2 - y2
+    // yPremik je vektor y smeri: y2 - y1
     // smerNeba: N, S, W, ali E
     // zbijanje: bool, ki pove, a kmet zbija
     // zaenkrat ignoriramo premikanje za dva polja in pa en passant
@@ -75,6 +75,13 @@ var Igra = function(plošča) {
     this.igralecNaVrsti = 1;  // 1, 2, 3, ali 4
 
     this.vrstniRedIgralcev = [1, 3, 2, 4];
+
+    this.enPassants = {
+        1 : null,  // format je 1 : (5, 3), kjer polje (5, 3) predstavlja polje, kjer bi kmet bil, če bi šel le za eno naprej. Po eni rundi se to polje spremeni v null, razen če ta igralec prestavi kakega drugega kmeta za dve naprej
+        2 : null,
+        3 : null,
+        4 : null
+    }
 
     this.pridobiNaslednjegaIgralca = function() {
         trenutniIndeks = this.vrstniRedIgralcev.indexOf(this.igralecNaVrsti);
@@ -493,6 +500,43 @@ var Igra = function(plošča) {
         return false;
     }
 
+    this.vrniVseEnPassanteOdNasprotnikov = function(neNasprotnik=this.igralecNaVrsti) {  // vrne seznam tuplov (ne vsebuje nullov)
+        var sez = [];
+        for (var ključ in this.enPassants) {
+            if (ključ !== neNasprotnik) {
+                var vrednost = this.enPassants[ključ];
+                if (vrednost != null) {
+                    sez.push(vrednost);
+                }
+            }
+        }
+        return sez;
+    }
+
+    this.vrniVseEnPassanteOdNasprotnikov2 = function(neNasprotnik=this.igralecNaVrsti) {  // vrne seznam dvojic: igralec, tuple (brez nullov)
+        var sez = [];
+        for (var ključ in this.enPassants) {
+            if (ključ !== neNasprotnik) {
+                var vrednost = this.enPassants[ključ];
+                if (vrednost != null) {
+                    sez.push([ključ, vrednost]);
+                }
+            }
+        }
+        return sez;
+    }
+
+    /*
+    this.izIgralcaPridobiKmetaKiSeJePremaknilZaDve = function(igralec) {
+        var koordEnPassant = this.enPassants[igralec];
+        if (koordEnPassant == null) {
+            throw "To se ne sme zgoditi.";
+        }
+        var smerIgralca = this.smerniVektorji[this.smeri[igralec]];
+        return seštej(koordEnPassant, smerIgralca);
+    }
+    */
+
     this.kmetSeLahkoPremakne = function(x1, y1, x2, y2, lastnikKmeta=this.igralecNaVrsti) {
         // console.log(cilj);  // že tu je cilj definiran in celo enak kot pa po naslednji vrstici. Ne vem pa, zakaj
         var cilj = this.vrniPolje(x2, y2);  // te vrstice torej ne rabimo, ampak za preglednost je boljš
@@ -500,7 +544,7 @@ var Igra = function(plošča) {
         // tako navaden premik kot zbijanje je dovoljeno
         // predpostavljamo, da (x2, y2) ni zasedeno s prijateljsko figuro oz. s skalo, in da na (x1, y1) res kmet, in to ustreznega igralca. Tega ne bomo preverjali posebej
         var smer = this.smerniVektorji[this.smeri[lastnikKmeta]];  // tuki dejansko ne rabimo zamenjat this.igralecNaVrsti z neNasprotnik, ampak ni važno
-        return potezaKmetaVeljavna(x2 - x1, y2 - y1, smer, cilj !== "EE", 
+        return potezaKmetaVeljavna(x2 - x1, y2 - y1, smer, cilj !== "EE" || seznamVsebuje(this.vrniVseEnPassanteOdNasprotnikov(lastnikKmeta), [x2, y2]), 
             this.poljeJeTakšnoDaLahkoKmetiGrejoZaDvaNaprej(x1, y1, lastnikKmeta) && // ali je polje ustrezno za kmetov dvojni korak naprej
             this.vrniPolje(seštej([x1, y1], smer)[0], seštej([x1, y1], smer)[1]) === "EE"  // preverimo, da kmet, ki bi šel za dve polji naprej, ni preskočil kake figure ali pa skale
         );
@@ -564,6 +608,27 @@ var Igra = function(plošča) {
         }
         this.plošča[y2][x2] = this.plošča[y1][x1];
         this.plošča[y1][x1] = "EE";
+        
+        for (var [igralec, enPassant] of this.vrniVseEnPassanteOdNasprotnikov2(this.igralecNaVrsti)) {
+            if (enPassant == null) throw "To se itak naj ne bi zgodilo.";
+            if (seznamaStaEnaka(enPassant, [x2, y2]) && this.plošča[y2][x2][0] === "P" && Math.min(Math.abs(x2 - x1), Math.abs(y2 - y1)) === 1) {
+                var smerNasprotnika = this.smerniVektorji[this.smeri[igralec]];
+                var noveKoordinate = seštej(enPassant, smerNasprotnika);
+                var [x, y] = noveKoordinate;
+                this.plošča[y][x] = "EE";  // zbijemo nasprotnika preko en passanta
+            }
+        }
+        /*
+        if (seznamVsebuje(this.vrniVseEnPassanteOdNasprotnikov(this.igralecNaVrsti), [x2, y2]) && this.plošča[y2][x2][0] === "P" && Math.min(Math.abs(x2 - x1), Math.abs(y2 - y1)) === 1) {
+            // tu zbijemo nasprotnika preko en passanta
+        }
+        */
+
+        if (this.plošča[y2][x2][0] === "P" && Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)) === 2) {  // dvojni skok kmeta
+            this.enPassants[this.igralecNaVrsti] = [(x1 + x2)/2, (y1 + y2)/2];
+        } else {
+            this.enPassants[this.igralecNaVrsti] = null;  // resetiramo en passant
+        }
 
         this.aliJeŠahMat();
 
