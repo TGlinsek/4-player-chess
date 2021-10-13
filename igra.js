@@ -1,6 +1,6 @@
 var vrniIgralca = function(string) {  // vrne 1, če prvi igralec, oz. 2, če drugi igralec, oz. ..., drugače vrne 0, če prazno polje, če pa skala, pa vrne -1
     if (["1", "2", "3", "4"].includes(string[1])) return parseInt(string[1]);
-    if (string[1] === "X") return -1;
+    if (string[1] == "X") return -1;
     return 0;
 }
 
@@ -10,7 +10,7 @@ var seznamaStaEnaka = function(sez1, sez2) {  // seznama morata biti dolžine 2
     [a, b] = sez1;
     var x, y;
     [x, y] = sez2;
-    return a === x && b === y;
+    return a == x && b == y;
 }
 
 var seznamVsebuje = function(sez, vsebovanec) {  // le če vsebovanec in vsi elementi seza vsi dolžine 2
@@ -150,9 +150,9 @@ var Igra = function(plošča) {
     this.končnoPolje = null;
 
     this.poltrakJeProstInVeljaven = function(x1, y1, x2, y2) {  // za poltrak se šteje vsaka izmed 8 glavnih smeri: 4 smeri neba in 4 diagonale
-        if (Math.abs(x1 - x2) !== Math.abs(y1 - y2) && x1 !== x2 && y1 !== y2) return false;  // to sploh ni poltrak
+        if (Math.abs(x1 - x2) != Math.abs(y1 - y2) && x1 != x2 && y1 != y2) return false;  // to sploh ni poltrak
         for (var i = 1; i < Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)); i++) {
-            if ("EE" !== this.vrniPolje(x1 + i * Math.sign(x2 - x1), y1 + i * Math.sign(y2 - y1))) {
+            if ("EE" != this.vrniPolje(x1 + i * Math.sign(x2 - x1), y1 + i * Math.sign(y2 - y1))) {
                 return false;
             }
         }
@@ -164,14 +164,14 @@ var Igra = function(plošča) {
         for (var i = -1; i <= 1; i += 2) {
             for (var j = -1; j <= 1; j += 2) {
                 var k = 1;
-                while (this.vrniPolje(x + k * i, y + k * j) === "EE") {
+                while (this.vrniPolje(x + k * i, y + k * j) == "EE") {
                     k += 1;
                 }
                 var meja = this.vrniPolje(x + k * i, y + k * j);
-                if (meja === "XX") {
+                if (meja == "XX") {
                     continue;
                 }
-                if (meja[1] !== String(igralec) && (["L", "Q", "A"].includes(meja[0]) || (k === 1 && meja[0] === "K"))) {
+                if (meja[1] != String(igralec) && (["L", "Q", "A"].includes(meja[0]) || (k == 1 && meja[0] == "K"))) {
                     // return [true, [x + k * i, y + k * j]];  // bomo rajš tkle: če je true, potem seznam ni prazen, če pa je false, pa je
                     seznamNapadalcev.push([x + k * i, y + k * j]);
                 }
@@ -189,7 +189,7 @@ var Igra = function(plošča) {
         for (var i = 0; i < sez.length; i++) {
             var x_, y_;
             [x_, y_] = sez[i];
-            if (this.vrniPolje(x_, y_)[1] === String(napadalec)) {  // napadalec je int
+            if (this.vrniPolje(x_, y_)[1] == String(napadalec)) {  // napadalec je int
                 novSez.push(sez[i]);
             }
         }
@@ -199,14 +199,14 @@ var Igra = function(plošča) {
         for (var i = -1; i <= 1; i += 2) {
             for (var j = -1; j <= 1; j += 2) {
                 var k = 1;
-                while (this.vrniPolje(x + k * i, y + k * j) === "EE") {
+                while (this.vrniPolje(x + k * i, y + k * j) == "EE") {
                     k += 1;
                 }
                 var meja = this.vrniPolje(x + k * i, y + k * j);
-                if (meja === "XX") {
+                if (meja == "XX") {
                     continue;
                 }
-                if (meja[1] === String(napadalec) && (["L", "Q", "A"].includes(meja[0]) || (k === 1 && meja[0] === "K" && kraljJeVključen))) {
+                if (meja[1] == String(napadalec) && (["L", "Q", "A"].includes(meja[0]) || (k == 1 && meja[0] == "K" && kraljJeVključen))) {
                     // return [true, [x + k * i, y + k * j]];  // bomo rajš tkle: če je true, potem seznam ni prazen, če pa je false, pa je
                     seznamNapadalcev.push([x + k * i, y + k * j]);
                 }
@@ -221,7 +221,7 @@ var Igra = function(plošča) {
             for (var j = -1; j <= 1; j += 2) {
                 var k = 1;
 
-                var i_ = (i !== j) * i, j_ = (i === j) * j;
+                var i_ = (i != j) * i, j_ = (i == j) * j;
                 /*
                 (1, -1) -> (1, 0)
                 (-1, 1) -> (-1, 0)
@@ -229,14 +229,14 @@ var Igra = function(plošča) {
                 (-1, -1) -> (0, -1)
                 */
 
-                while (this.vrniPolje(x + k * i_, y + k * j_) === "EE") {
+                while (this.vrniPolje(x + k * i_, y + k * j_) == "EE") {
                     k += 1;
                 }
                 var meja = this.vrniPolje(x + k * i_, y + k * j_);
-                if (meja === "XX") {
+                if (meja == "XX") {
                     continue;
                 }
-                if (meja[1] !== String(igralec) && (["R", "Q", "A"].includes(meja[0]) || (k === 1 && meja[0] === "K"))) {
+                if (meja[1] != String(igralec) && (["R", "Q", "A"].includes(meja[0]) || (k == 1 && meja[0] == "K"))) {
                     // return [true, [x + k * i_, y + k * j_]];
                     seznamNapadalcev.push([x + k * i_, y + k * j_])
                 }
@@ -253,7 +253,7 @@ var Igra = function(plošča) {
         for (var i = 0; i < sez.length; i++) {
             var x_, y_;
             [x_, y_] = sez[i];
-            if (this.vrniPolje(x_, y_)[1] === String(napadalec)) {  // napadalec je int
+            if (this.vrniPolje(x_, y_)[1] == String(napadalec)) {  // napadalec je int
                 novSez.push(sez[i]);
             }
         }
@@ -264,7 +264,7 @@ var Igra = function(plošča) {
             for (var j = -1; j <= 1; j += 2) {
                 var k = 1;
 
-                var i_ = (i !== j) * i, j_ = (i === j) * j;
+                var i_ = (i != j) * i, j_ = (i == j) * j;
                 /*
                 (1, -1) -> (1, 0)
                 (-1, 1) -> (-1, 0)
@@ -272,14 +272,14 @@ var Igra = function(plošča) {
                 (-1, -1) -> (0, -1)
                 */
 
-                while (this.vrniPolje(x + k * i_, y + k * j_) === "EE") {
+                while (this.vrniPolje(x + k * i_, y + k * j_) == "EE") {
                     k += 1;
                 }
                 var meja = this.vrniPolje(x + k * i_, y + k * j_);
-                if (meja === "XX") {
+                if (meja == "XX") {
                     continue;
                 }
-                if (meja[1] === String(napadalec) && (["R", "Q", "A"].includes(meja[0]) || (k === 1 && meja[0] === "K" && kraljJeVključen))) {
+                if (meja[1] == String(napadalec) && (["R", "Q", "A"].includes(meja[0]) || (k == 1 && meja[0] == "K" && kraljJeVključen))) {
                     // return [true, [x + k * i_, y + k * j_]];
                     seznamNapadalcev.push([x + k * i_, y + k * j_])
                 }
@@ -298,7 +298,7 @@ var Igra = function(plošča) {
                     if (["EE", "XX"].includes(meja)) {
                         continue;
                     }
-                    if (meja[1] !== String(igralec) && ["V", "A"].includes(meja[0])) {
+                    if (meja[1] != String(igralec) && ["V", "A"].includes(meja[0])) {
                         // return [true, koordMeje];
                         seznamNapadalcev.push(koordMeje);
                     }
@@ -315,7 +315,7 @@ var Igra = function(plošča) {
         for (var i = 0; i < sez.length; i++) {
             var x_, y_;
             [x_, y_] = sez[i];
-            if (this.vrniPolje(x_, y_)[1] === String(napadalec)) {  // napadalec je int
+            if (this.vrniPolje(x_, y_)[1] == String(napadalec)) {  // napadalec je int
                 novSez.push(sez[i]);
             }
         }
@@ -330,7 +330,7 @@ var Igra = function(plošča) {
                     if (["EE", "XX"].includes(meja)) {
                         continue;
                     }
-                    if (meja[1] === String(napadalec) && ["V", "A"].includes(meja[0])) {
+                    if (meja[1] == String(napadalec) && ["V", "A"].includes(meja[0])) {
                         // return [true, koordMeje];
                         seznamNapadalcev.push(koordMeje);
                     }
@@ -348,11 +348,11 @@ var Igra = function(plošča) {
                 if (["EE", "XX"].includes(meja)) {
                     continue;
                 }
-                if (meja[1] === String(igralec)) {  // svojih kmetov ne upoštevamo
+                if (meja[1] == String(igralec)) {  // svojih kmetov ne upoštevamo
                     continue;
                 }
                 var smer = this.smeri[parseInt(meja[1])];
-                if (meja[0] === "P" && seznamVsebuje([[-i, 0], [0, -j]], this.smerniVektorji[smer])) {  // če (i, j) vektor iz (x, y) do (x + i, y + j), potem sta vektorja (-i, 0) in (0, -j) ravno ta vektorja, da te kmet s to smerjo premikanja lahko zbije
+                if (meja[0] == "P" && seznamVsebuje([[-i, 0], [0, -j]], this.smerniVektorji[smer])) {  // če (i, j) vektor iz (x, y) do (x + i, y + j), potem sta vektorja (-i, 0) in (0, -j) ravno ta vektorja, da te kmet s to smerjo premikanja lahko zbije
                     // return [true, [x + i, y + j]];
                     seznamNapadalcev.push([x + i, y + j]);
                 }
@@ -368,13 +368,13 @@ var Igra = function(plošča) {
         for (var i = 0; i < sez.length; i++) {
             var x_, y_;
             [x_, y_] = sez[i];
-            if (this.vrniPolje(x_, y_)[1] === String(napadalec)) {  // napadalec je int
+            if (this.vrniPolje(x_, y_)[1] == String(napadalec)) {  // napadalec je int
                 novSez.push(sez[i]);
             }
         }
         return novSez;
         */
-        if (this.vrniPolje(x, y)[1] === String(napadalec) || this.vrniPolje(x, y)[1] === "E" || this.vrniPolje(x, y)[1] === "X") {
+        if (this.vrniPolje(x, y)[1] == String(napadalec) || this.vrniPolje(x, y)[1] == "E" || this.vrniPolje(x, y)[1] == "X") {
             return [];  // namreč ne kmet ne more napadati, če to kar napada ni nasprotnikova figura
         }
 
@@ -385,11 +385,11 @@ var Igra = function(plošča) {
                 if (["EE", "XX"].includes(meja)) {
                     continue;
                 }
-                if (meja[1] !== String(napadalec)) {  // figura mora biti napadalčeva
+                if (meja[1] != String(napadalec)) {  // figura mora biti napadalčeva
                     continue;
                 }
                 var smer = this.smeri[parseInt(meja[1])];
-                if (meja[0] === "P" && seznamVsebuje([[-i, 0], [0, -j]], this.smerniVektorji[smer])) {  // če (i, j) vektor iz (x, y) do (x + i, y + j), potem sta vektorja (-i, 0) in (0, -j) ravno ta vektorja, da te kmet s to smerjo premikanja lahko zbije
+                if (meja[0] == "P" && seznamVsebuje([[-i, 0], [0, -j]], this.smerniVektorji[smer])) {  // če (i, j) vektor iz (x, y) do (x + i, y + j), potem sta vektorja (-i, 0) in (0, -j) ravno ta vektorja, da te kmet s to smerjo premikanja lahko zbije
                     // return [true, [x + i, y + j]];
                     seznamNapadalcev.push([x + i, y + j]);
                 }
@@ -399,14 +399,14 @@ var Igra = function(plošča) {
     }
 
     this.poljeJeVidenoPrekoKmetaSStraniNapadalca = function(x, y, napadalec) {
-        if (this.vrniPolje(x, y)[0] !== "E") {
+        if (this.vrniPolje(x, y)[0] != "E") {
             return [];  // namreč kmet se ne more premakniti naprej, če sprednje polje ni prazno
         }
 
         var seznamNapadalcev = [];
         for (var i = -1; i <= 1; i += 2) {
             for (var j = -1; j <= 1; j += 2) {
-                var i_ = (i !== j) * i, j_ = (i === j) * j;
+                var i_ = (i != j) * i, j_ = (i == j) * j;
                 /*
                 (1, -1) -> (1, 0)
                 (-1, 1) -> (-1, 0)
@@ -417,11 +417,11 @@ var Igra = function(plošča) {
                 if (["EE", "XX"].includes(meja)) {
                     continue;
                 }
-                if (meja[1] !== String(napadalec)) {
+                if (meja[1] != String(napadalec)) {
                     continue;
                 }
                 var smer = this.smeri[parseInt(meja[1])];
-                if (meja[0] === "P" && seznamaStaEnaka([-i_, -j_], this.smerniVektorji[smer])) {
+                if (meja[0] == "P" && seznamaStaEnaka([-i_, -j_], this.smerniVektorji[smer])) {
                     // return [true, [x + i_, y + j_]];
                     seznamNapadalcev.push([x + i_, y + j_]);
                 }
@@ -448,32 +448,32 @@ var Igra = function(plošča) {
     }
 
     this.šahJe = function(neNasprotnik, poljeKraljaOdNeNasprotnika=null) {  // vrne true, če je šah za neNasprotnika
-        if (poljeKraljaOdNeNasprotnika === null) {  // če to ni null, potem prihranimo veliko časa za iskanje polje kralja
+        if (poljeKraljaOdNeNasprotnika == null) {  // če to ni null, potem prihranimo veliko časa za iskanje polje kralja
             for (var i = 0; i < this.plošča.length; i++) {
                 for (var j = 0; j < this.plošča[i].length; j++) {
-                    if (this.vrniPolje(j, i) === ("K" + neNasprotnik)) {
+                    if (this.vrniPolje(j, i) == ("K" + neNasprotnik)) {
                         poljeKraljaOdNeNasprotnika = [j, i];
                     }
                 }
             }
         }
 
-        return this.nasprotnikVidiToPolje(poljeKraljaOdNeNasprotnika[0], poljeKraljaOdNeNasprotnika[1], neNasprotnik).length !== 0;
+        return this.nasprotnikVidiToPolje(poljeKraljaOdNeNasprotnika[0], poljeKraljaOdNeNasprotnika[1], neNasprotnik).length != 0;
     }
 
     this.trdnjavaSeLahkoPremakne = function(x1, y1, x2, y2) {  // predpostavljamo, da bi trdnjava lahko pristala na (x2, y2), tj., predpostavljamo, da tam ni recimo skale ali pa neke prijateljske figure (ampak tega ne bomo preverjali, kr zaupamo uporabniku te funkcije)
         // predpostavljamo tudi, da na (x1, y1) res trdnjava, ampak spet, tega ne bomo preverjali posebej
         // ni važno, a je trdnjava dejansko na x1, y1; tam je lahko karkoli drugega. Prav tako je na (x2, y2) lahko karkoli, ne rabi bit prazno
         // važno pa je, da so vsa polja vmes prazna, da se lahko hipotetična trdnjava pelje po njih
-        return (x1 === x2 || y1 === y2) && this.poltrakJeProstInVeljaven(x1, y1, x2, y2);
+        return (x1 == x2 || y1 == y2) && this.poltrakJeProstInVeljaven(x1, y1, x2, y2);
     }
 
     this.konjSeLahkoPremakne = function(x1, y1, x2, y2) {
-        return x1 !== x2 && y1 !== y2 && Math.abs(x1 - x2) + Math.abs(y1 - y2) === 3;
+        return x1 != x2 && y1 != y2 && Math.abs(x1 - x2) + Math.abs(y1 - y2) == 3;
     }
 
     this.tekačSeLahkoPremakne = function(x1, y1, x2, y2) {
-        return Math.abs(x2 - x1) === Math.abs(y2 - y1) && this.poltrakJeProstInVeljaven(x1, y1, x2, y2);
+        return Math.abs(x2 - x1) == Math.abs(y2 - y1) && this.poltrakJeProstInVeljaven(x1, y1, x2, y2);
     }
 
     this.kraljicaSeLahkoPremakne = function(x1, y1, x2, y2) {
@@ -487,23 +487,23 @@ var Igra = function(plošča) {
         // igra3.plošča = this.plošča.slice();  // plitka kopija
         igra3.plošča = JSON.parse(JSON.stringify(this.plošča));  // globoka kopija
         igra3.plošča[y1][x1] = "EE";  // kraljevo polje zamenjamo s praznim, zato da bo metoda "nasprotnikVidiToPolje" pravilno delovala (drugače bi lahko kralj zastiral pogled nasprotnikovih figur)
-        return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)) === 1 && !igra3.nasprotnikVidiToPolje(x2, y2, lastnikKralja)[0];
+        return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)) == 1 && !igra3.nasprotnikVidiToPolje(x2, y2, lastnikKralja)[0];
     }
 
     this.poljeJeTakšnoDaLahkoKmetiGrejoZaDvaNaprej = function(x, y, lastnikKmeta) {
         // lastnik kmeta je torej število od 1 do 4
         // return [1, 12].includes(y) || [1, 12].includes(x);  // lahko bi tudi vzeli presek [1, 12] in [x, y] in pogledali, ali je prazen
-        if (x === 1 && lastnikKmeta === 3) return true;  // leva
-        if (x === 12 && lastnikKmeta === 4) return true;  // desna
-        if (y === 1 && lastnikKmeta === 2) return true;  // gor
-        if (y === 12 && lastnikKmeta === 1) return true;  // dol
+        if (x == 1 && lastnikKmeta == 3) return true;  // leva
+        if (x == 12 && lastnikKmeta == 4) return true;  // desna
+        if (y == 1 && lastnikKmeta == 2) return true;  // gor
+        if (y == 12 && lastnikKmeta == 1) return true;  // dol
         return false;
     }
 
     this.vrniVseEnPassanteOdNasprotnikov = function(neNasprotnik=this.igralecNaVrsti) {  // vrne seznam tuplov (ne vsebuje nullov)
         var sez = [];
         for (var ključ in this.enPassants) {
-            if (ključ !== neNasprotnik) {
+            if (ključ != neNasprotnik) {  // to ne deluje pravilno, če uporabimo !==
                 var vrednost = this.enPassants[ključ];
                 if (vrednost != null) {
                     sez.push(vrednost);
@@ -516,7 +516,7 @@ var Igra = function(plošča) {
     this.vrniVseEnPassanteOdNasprotnikov2 = function(neNasprotnik=this.igralecNaVrsti) {  // vrne seznam dvojic: igralec, tuple (brez nullov)
         var sez = [];
         for (var ključ in this.enPassants) {
-            if (ključ !== neNasprotnik) {
+            if (ključ != neNasprotnik) {  // to ne deluje pravilno, če uporabimo !==
                 var vrednost = this.enPassants[ključ];
                 if (vrednost != null) {
                     sez.push([ključ, vrednost]);
@@ -544,9 +544,12 @@ var Igra = function(plošča) {
         // tako navaden premik kot zbijanje je dovoljeno
         // predpostavljamo, da (x2, y2) ni zasedeno s prijateljsko figuro oz. s skalo, in da na (x1, y1) res kmet, in to ustreznega igralca. Tega ne bomo preverjali posebej
         var smer = this.smerniVektorji[this.smeri[lastnikKmeta]];  // tuki dejansko ne rabimo zamenjat this.igralecNaVrsti z neNasprotnik, ampak ni važno
-        return potezaKmetaVeljavna(x2 - x1, y2 - y1, smer, cilj !== "EE" || seznamVsebuje(this.vrniVseEnPassanteOdNasprotnikov(lastnikKmeta), [x2, y2]), 
+        if (x2 == 5 && y2 == 11) {
+            console.log(seznamVsebuje(this.vrniVseEnPassanteOdNasprotnikov(lastnikKmeta), [x2, y2]));
+        }
+        return potezaKmetaVeljavna(x2 - x1, y2 - y1, smer, cilj != "EE" || seznamVsebuje(this.vrniVseEnPassanteOdNasprotnikov(lastnikKmeta), [x2, y2]), 
             this.poljeJeTakšnoDaLahkoKmetiGrejoZaDvaNaprej(x1, y1, lastnikKmeta) && // ali je polje ustrezno za kmetov dvojni korak naprej
-            this.vrniPolje(seštej([x1, y1], smer)[0], seštej([x1, y1], smer)[1]) === "EE"  // preverimo, da kmet, ki bi šel za dve polji naprej, ni preskočil kake figure ali pa skale
+            this.vrniPolje(seštej([x1, y1], smer)[0], seštej([x1, y1], smer)[1]) == "EE"  // preverimo, da kmet, ki bi šel za dve polji naprej, ni preskočil kake figure ali pa skale
         );
     }
 
@@ -557,10 +560,10 @@ var Igra = function(plošča) {
     this.premikJeMožen = function(x1, y1, x2, y2, neNasprotnik=this.igralecNaVrsti, poljeKraljaOdNeNasprotnika=null) {  // x gre od 0 do 7, prav tako y
         izhodišče = this.vrniPolje(x1, y1);
         cilj = this.vrniPolje(x2, y2);
-        if (vrniIgralca(izhodišče) !== neNasprotnik) return false;  // false, saj ne premikamo svoje figure, ampak figuro nekoga drugega
+        if (vrniIgralca(izhodišče) != neNasprotnik) return false;  // false, saj ne premikamo svoje figure, ampak figuro nekoga drugega
         if ([-1, neNasprotnik].includes(vrniIgralca(cilj))) return false;  // false, saj premikamo v skalo ali pa v svoje figure
-        if (x1 === x2 && y1 === y2) return false;  // cilj ne sme biti enak izhodišču
-        if (izhodišče[0] !== "K") {  // če ni kralj, kr drugač se polje kralja spremeni. Za kralja je pa itak že spodaj poskrbljeno
+        if (x1 == x2 && y1 == y2) return false;  // cilj ne sme biti enak izhodišču
+        if (izhodišče[0] != "K") {  // če ni kralj, kr drugač se polje kralja spremeni. Za kralja je pa itak že spodaj poskrbljeno
             var igra2 = new Igra();  // skopiramo igro
             // igra2.plošča = this.plošča.slice();  // plitka kopija
             igra2.plošča = JSON.parse(JSON.stringify(this.plošča));  // globoka kopija
@@ -611,7 +614,7 @@ var Igra = function(plošča) {
         
         for (var [igralec, enPassant] of this.vrniVseEnPassanteOdNasprotnikov2(this.igralecNaVrsti)) {
             if (enPassant == null) throw "To se itak naj ne bi zgodilo.";
-            if (seznamaStaEnaka(enPassant, [x2, y2]) && this.plošča[y2][x2][0] === "P" && Math.min(Math.abs(x2 - x1), Math.abs(y2 - y1)) === 1) {
+            if (seznamaStaEnaka(enPassant, [x2, y2]) && this.plošča[y2][x2][0] == "P" && Math.min(Math.abs(x2 - x1), Math.abs(y2 - y1)) == 1) {
                 var smerNasprotnika = this.smerniVektorji[this.smeri[igralec]];
                 var noveKoordinate = seštej(enPassant, smerNasprotnika);
                 var [x, y] = noveKoordinate;
@@ -619,12 +622,12 @@ var Igra = function(plošča) {
             }
         }
         /*
-        if (seznamVsebuje(this.vrniVseEnPassanteOdNasprotnikov(this.igralecNaVrsti), [x2, y2]) && this.plošča[y2][x2][0] === "P" && Math.min(Math.abs(x2 - x1), Math.abs(y2 - y1)) === 1) {
+        if (seznamVsebuje(this.vrniVseEnPassanteOdNasprotnikov(this.igralecNaVrsti), [x2, y2]) && this.plošča[y2][x2][0] == "P" && Math.min(Math.abs(x2 - x1), Math.abs(y2 - y1)) == 1) {
             // tu zbijemo nasprotnika preko en passanta
         }
         */
 
-        if (this.plošča[y2][x2][0] === "P" && Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)) === 2) {  // dvojni skok kmeta
+        if (this.plošča[y2][x2][0] == "P" && Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)) == 2) {  // dvojni skok kmeta
             this.enPassants[this.igralecNaVrsti] = [(x1 + x2)/2, (y1 + y2)/2];
         } else {
             this.enPassants[this.igralecNaVrsti] = null;  // resetiramo en passant
@@ -645,7 +648,7 @@ var Igra = function(plošča) {
             ...this.poljeJeNapadenoPoKonjeSStraniNapadalca(x, y, igralec), 
             ...this.poljeJeNapadenoOzVidenoPrekoKmetaSStraniNapadalca(x, y, igralec)
         ];
-        return unija.length !== 0;
+        return unija.length != 0;
     }
 
     this.aliJeŠahMat = function() {
@@ -656,11 +659,11 @@ var Igra = function(plošča) {
             var igralec = this.vrstniRedIgralcev[k];
             for (var i = 0; i < this.plošča.length; i++) {
                 for (var j = 0; j < this.plošča[i].length; j++) {
-                    if (this.vrniPolje(j, i) === ("K" + igralec)) {  // polepšaj kodo: TODO
+                    if (this.vrniPolje(j, i) == ("K" + igralec)) {  // polepšaj kodo: TODO
                         preprečevanjeŠaha:
                         {  // morda lahko šah preprečimo s tem, da nastavimo kako našo figuro vmes, ali pa nasprotnikovo figuro kar pojemo
                             var koordinateNasprotnikov = this.nasprotnikVidiToPolje(j, i, igralec);
-                            if (koordinateNasprotnikov.length === 0) {
+                            if (koordinateNasprotnikov.length == 0) {
                                 continue zankaČezVseIgralce;  // pol itak ni šah
                             }
                             console.log("Šah je za igralca " + this.vrstniRedIgralcev[k]);
@@ -682,32 +685,32 @@ var Igra = function(plošča) {
                             var nasprotnikovaFigura = this.vrniPolje(x, y)[0];
                             if (["V", "P"].includes(nasprotnikovaFigura)) {  // če nas napada konj oz. kmet
                                 // potem nič ne moremo postaviti med konja/kmeta in našega kralja, lahk ga sam pojemo
-                            } else if (nasprotnikovaFigura === "L") {
-                                // if (!(Math.abs(x - j) === Math.abs(y - i) && this.poltrakJeProstInVeljaven(j, i, x, y))) throw "To se ne bi smelo zgoditi: tekač v tem primeru sploh ne more napadati našega kralja!";
+                            } else if (nasprotnikovaFigura == "L") {
+                                // if (!(Math.abs(x - j) == Math.abs(y - i) && this.poltrakJeProstInVeljaven(j, i, x, y))) throw "To se ne bi smelo zgoditi: tekač v tem primeru sploh ne more napadati našega kralja!";
                                 if (!this.tekačSeLahkoPremakne(j, i, x, y)) throw "To se ne bi smelo zgoditi: tekač v tem primeru sploh ne more napadati našega kralja!";
 
                                 for (var l = 1; l < Math.abs(x - j); l++) {
                                     seznamPoljKamorJeTrebaDatiNašoFiguroDaPreprečimoŠah.push([j + l * Math.sign(x - j), i + l * Math.sign(y - i)]);
                                 }
-                            } else if (nasprotnikovaFigura === "R") {
-                                // if (!((j === x || i === y) && this.poltrakJeProstInVeljaven(j, i, x, y))) throw "Trdnjava nas sploh ne napada! To se ne bi smelo zgoditi.";
+                            } else if (nasprotnikovaFigura == "R") {
+                                // if (!((j == x || i == y) && this.poltrakJeProstInVeljaven(j, i, x, y))) throw "Trdnjava nas sploh ne napada! To se ne bi smelo zgoditi.";
                                 if (!this.trdnjavaSeLahkoPremakne(j, i, x, y)) throw "Trdnjava nas sploh ne napada! To se ne bi smelo zgoditi.";
 
                                 for (var l = 1; l < Math.max(Math.abs(x - j), Math.abs(y - i)); l++) {
                                     seznamPoljKamorJeTrebaDatiNašoFiguroDaPreprečimoŠah.push([j + l * Math.sign(x - j), i + l * Math.sign(y - i)]);
                                 }
-                            } else if (nasprotnikovaFigura === "Q") {
+                            } else if (nasprotnikovaFigura == "Q") {
                                 // if (!this.poltrakJeProstInVeljaven(j, i, x, y)) throw "To se ne bi smelo zgoditi, saj kraljica sploh ne more v tem primeru napadati našega kralja.";
                                 if (!this.kraljicaSeLahkoPremakne(j, i, x, y)) throw "To se ne bi smelo zgoditi, saj kraljica sploh ne more v tem primeru napadati našega kralja.";
                                 
                                 for (var l = 1; l < Math.max(Math.abs(x - j), Math.abs(y - i)); l++) {
                                     seznamPoljKamorJeTrebaDatiNašoFiguroDaPreprečimoŠah.push([j + l * Math.sign(x - j), i + l * Math.sign(y - i)]);
                                 }
-                            } else if (nasprotnikovaFigura === "A") {
-                                // if (!((j !== x && i !== y && Math.abs(j - x) + Math.abs(i - y) === 3) || this.poltrakJeProstInVeljaven(j, i, x, y))) throw "Konjica sploh ni v pravem položaju za napadanje! Nekaj je šlo narobe ...";
+                            } else if (nasprotnikovaFigura == "A") {
+                                // if (!((j != x && i != y && Math.abs(j - x) + Math.abs(i - y) == 3) || this.poltrakJeProstInVeljaven(j, i, x, y))) throw "Konjica sploh ni v pravem položaju za napadanje! Nekaj je šlo narobe ...";
                                 if (!this.konjicaSeLahkoPremakne(j, i, x, y)) throw "Konjica sploh ni v pravem položaju za napadanje! Nekaj je šlo narobe ...";
                                 
-                                // if (j !== x && i !== y && Math.abs(j - x) + Math.abs(i - y) === 3) {  // konjica našega kralja napada iz konjske pozicije
+                                // if (j != x && i != y && Math.abs(j - x) + Math.abs(i - y) == 3) {  // konjica našega kralja napada iz konjske pozicije
                                 if (this.konjSeLahkoPremakne(j, i, x, y)) {  // konjica našega kralja napada iz konjske pozicije
                                     // nič ne moremo narediti, ker potem med konjico in kraljem ne moremo ničesar postaviti, da bi odpravili šah
                                 } else {  // zdaj pa postopamo isto kot pri kraljici
@@ -734,6 +737,7 @@ var Igra = function(plošča) {
                             this.šahiraniIgralci.push(this.vrstniRedIgralcev[k]);
                         }
 
+                        /*
                         if (this.premikJeMožen(j, i, j + 1, i + 1, igralec, [j, i])) {
                             continue zankaČezVseIgralce;
                         }
@@ -758,6 +762,19 @@ var Igra = function(plošča) {
                         if (this.premikJeMožen(j, i, j, i + 1, igralec, [j, i])) {
                             continue zankaČezVseIgralce;
                         }
+                        */
+
+                        
+                        for (var k = -1; k <= 1; k++) {
+                            for (var l = -1; l <= 1; l++) {
+                                if (k != 0 || l != 0) {
+                                    if (this.premikJeMožen(j, i, j + k, i + l, igralec, [j, i])) {
+                                        continue zankaČezVseIgralce;
+                                    }
+                                }
+                            }
+                        }
+                        
                     }
                 }
             }
