@@ -1,7 +1,7 @@
 # ustvari slike in jih shrani v imenik "slike"
 from PIL import Image, ImageDraw, ImageFont
 import os
-from math import cos, sin, pi
+from math import cos, sin, tan, pi, sqrt
 
 from pathlib import Path
 
@@ -11,7 +11,7 @@ starš = Path(__file__).parent
 
 os.chdir(starš)  # gremo eno mapo gor, da lahko gremo nazaj eno mapo dol
 cwd1 = os.getcwd()
-os.chdir("slike2")
+os.chdir("slike")
 
 # os.chdir("..") je za premikanje ene mape gor
 
@@ -29,8 +29,10 @@ def shrani(destinacija, slika):  # brez končnice
     pot = destinacija + ".png"
     slika.save(pot)
 
+
 unicode_font = ImageFont.truetype(cwd1 + "\\dejavu-fonts-ttf-2.37\\ttf\\DejaVuSans.ttf", 20)  # ta font si lahko naložimo na https://sourceforge.net/projects/dejavu/
 # unicode_font = None  # če hočemo default font, ampak potem se pri šumnikih sesuje
+
 
 def napiši(draw, tekst, barva, koordinate):
     draw.multiline_text(koordinate, tekst, fill=barva, font=unicode_font)  # prvi parameter je koordinata začetka teksta (levo zgoraj od teksta)
@@ -39,9 +41,12 @@ def napiši(draw, tekst, barva, koordinate):
 def napiši_multiline(draw, tekst, barva, koordinate):
     draw.multiline_text(koordinate, tekst, fill=barva, font=unicode_font, align="center")  # lahko dodamo \n v tekst
 
+
 širinaSlike, višinaSlike = 100, 100
 
+
 besede = ["Kralj", "Kraljica", "Tekač", "Konj", "Trdnjava", "Kmet", "Konjica"]
+
 
 barveVImeBarve = {
     (0, 0, 255, 128) : "modra",
@@ -50,6 +55,7 @@ barveVImeBarve = {
     (255, 0, 0, 128) : "rdeča"
 }
 
+
 barveVIgralca = {
     (0, 0, 255, 128) : 1,
     (0, 255, 0, 128) : 3,
@@ -57,6 +63,8 @@ barveVIgralca = {
     (255, 0, 0, 128) : 4
 }
 
+
+"""
 smeri = {
     1 : "N",
     3 : "E",
@@ -64,12 +72,16 @@ smeri = {
     4 : "W"
 }
 
+
 oznakeSmeri = {
     "N" : "↑",
     "E" : "→",
     "S" : "↓",
     "W" : "←"
 }
+"""
+
+
 def razpakiraj(nabor):
     prva, druga, *ostalo = nabor
     try:
@@ -80,6 +92,7 @@ def razpakiraj(nabor):
         x1, y1 = prva
         x2, y2 = druga
     return (x1, y1, x2, y2)
+
 
 def elipsa(draw, koordinate, koordinate_pravokotnika, barva_ozadja, fill, outline, width):
     # outline je barva, width pa debelina
@@ -93,6 +106,7 @@ def elipsa(draw, koordinate, koordinate_pravokotnika, barva_ozadja, fill, outlin
     draw.rectangle(((max(x1, x1_), max(y1, y1_)), (min(x2, x2_), min(y2, y2_))), fill=barva_ozadja)
 
     draw.rectangle(((x1_, y1_), (x2_, y2_)), fill=barva_ozadja)
+
 
 def nazobčana_glava(x1, y1, x2, y2, globina_luknje, število_zobov=3, fill=0, width=5):
     # točka (x2, y2) je nižje in bolj desno kot točka (x1, y1)
@@ -113,6 +127,21 @@ def nazobčana_glava(x1, y1, x2, y2, globina_luknje, število_zobov=3, fill=0, w
     return
 
 
+def krona(x1, y1, x2, y2, št_zobov, globina_zarez):
+    # x1 je levo, x2 desno
+    # y1 je zgoraj, y2 je spodaj
+
+    draw.line((x1, y2, x1, y1), fill=(0, 0, 0), width=1)
+    širina = x2 - x1
+    razmik = širina/(št_zobov - 1)
+    for i in range(št_zobov - 1):
+        draw.line((x1 + i*razmik, y1, x1 + (i + 0.5)*razmik, y1 + globina_zarez), fill=(0, 0, 0), width=1)
+        draw.line((x1 + (i + 0.5)*razmik, y1 + globina_zarez, x1 + (i + 1)*razmik, y1), fill=(0, 0, 0), width=1)
+    
+    draw.line((x2, y1, x2, y2), fill=(0, 0, 0), width=1)
+    return
+
+
 for ba in barveVIgralca.keys():
     for be in besede:
         out = Image.new("RGBA", (širinaSlike, višinaSlike), ba)
@@ -129,7 +158,7 @@ for ba in barveVIgralca.keys():
             ime = "kmet" + "_" + barveVImeBarve[ba]
             shrani(ime, out)
         elif be == "Kralj":
-            višina_rect = 1.2*višinaSlike/10
+            višina_rect = 1.2*višinaSlike/10  # višina sredinskega člena
             x1 = -širinaSlike/2
             y1 = 0
             x2 = 2*širinaSlike/5
@@ -179,7 +208,7 @@ for ba in barveVIgralca.keys():
             ime = "kralj" + "_" + barveVImeBarve[ba]
             shrani(ime, out)
         elif be == "Kraljica":
-            višina_rect = 1.2*višinaSlike/10
+            višina_rect = 1.2*višinaSlike/10  # višina sredinskega člena
             x1 = -širinaSlike/2
             y1 = 0
             x2 = 2*širinaSlike/5
@@ -228,7 +257,7 @@ for ba in barveVIgralca.keys():
             ime = "kraljica" + "_" + barveVImeBarve[ba]
             shrani(ime, out)
         elif be == "Trdnjava":
-            višina_rect = 0
+            višina_rect = 0  # višina sredinskega člena
             x1 = -širinaSlike
             y1 = -višinaSlike/2
             x2 = širinaSlike/4
@@ -279,20 +308,241 @@ for ba in barveVIgralca.keys():
             
             ime = "trdnjava" + "_" + barveVImeBarve[ba]
             shrani(ime, out)
-        
+        elif be == "Tekač":
+            višina_rect = 0.7*višinaSlike/10  # višina sredinskega člena
+            x1 = -širinaSlike/2
+            y1 = 0
+            x2 = 2.3*širinaSlike/5
+            y2 = 4.5*višinaSlike/5
+
+            
+            rx = (x2 - x1)/2
+            x0 = x1 + rx
+            ry = (y2 - y1)/2
+            y0 = y1 + ry - višina_rect
+
+            kot1 = 15
+            kot1_rad = kot1*pi/180
+            
+
+            # vrh
+            # draw.line((x0 + rx*cos(kot1_rad), y0 - ry*sin(kot1_rad), širinaSlike - (x0 + rx*cos(kot1_rad)), y0 - ry*sin(kot1_rad)), fill=0, width=5)
+
+            # glava
+            polmer_glave = (rx + širinaSlike/2 - x2)/cos(kot1_rad) - sqrt((rx*cos(kot1_rad))**2 + (ry*sin(kot1_rad))**2)
+            y_središča_glave = y0 - (rx + širinaSlike/2 - x2)*tan(kot1_rad)
+            draw.arc((širinaSlike/2 - polmer_glave, y_središča_glave - polmer_glave, širinaSlike/2 + polmer_glave, y_središča_glave + polmer_glave), 180 - kot1, kot1, fill=0, width=3)
+
+            # bunkica
+            višina_križa = 0.7*višinaSlike/10
+            širina_križa = 0.7*širinaSlike/10
+            draw.ellipse((širinaSlike/2 - širina_križa/2, y_središča_glave - polmer_glave - višina_križa, širinaSlike/2 + širina_križa/2, y_središča_glave - polmer_glave), fill=(0, 0, 0), width=5)
+
+            # zgornje krivulje
+            draw.arc((x1, y1 - višina_rect, x2, y2 - višina_rect), -kot1, 0, fill=0, width=3)
+            draw.arc((širinaSlike - x2, y1 - višina_rect, širinaSlike - x1, y2 - višina_rect), 180, 180 + kot1, fill=0, width=3)
+            
+            # vmesni_člen
+            kok_gleda_ven = 0.7*širinaSlike/10
+            draw.rectangle([(x2 - kok_gleda_ven, y0), (širinaSlike - (x2 - kok_gleda_ven), y0 + višina_rect)], outline=(0, 0, 0), width=3)
+
+            y0_ = y0 + višina_rect
+
+            # spodnje krivulje
+            kot2 = 50
+            kot2_rad = kot2*pi/180
+            draw.arc((x1, y1, x2, y2), 0, kot2, fill=0, width=3)
+            draw.arc((širinaSlike - x2, y1, širinaSlike - x1, y2), 180 - kot2, 180, fill=0, width=3)
+
+            # podstavek
+            višina_podstavka = 0.8*višinaSlike/10
+            sp = y0_ + ry*sin(kot2_rad) + višina_podstavka
+            lv = x0 + rx*cos(kot2_rad)
+            kok_podstavek_ven_gleda = 0
+            draw.rectangle([(lv - kok_podstavek_ven_gleda, sp - višina_podstavka), (širinaSlike - lv + kok_podstavek_ven_gleda, sp)], outline=(0, 0, 0), width=3)
+
+            ime = "tekač" + "_" + barveVImeBarve[ba]
+            shrani(ime, out)
+        elif be == "Konj":
+            """
+            višina_rect = 0.7*višinaSlike/10  # višina sredinskega člena
+            x1 = -širinaSlike/2
+            y1 = 0
+            x2 = 2.3*širinaSlike/5
+            y2 = 4.5*višinaSlike/5
+
+            
+            rx = (x2 - x1)/2
+            x0 = x1 + rx
+            ry = (y2 - y1)/2
+            y0 = y1 + ry - višina_rect
+
+            kot1 = 15
+            kot1_rad = kot1*pi/180
+            
+
+            # vrh
+            # draw.line((x0 + rx*cos(kot1_rad), y0 - ry*sin(kot1_rad), širinaSlike - (x0 + rx*cos(kot1_rad)), y0 - ry*sin(kot1_rad)), fill=0, width=5)
+
+            # glava
+            polmer_glave = (rx + širinaSlike/2 - x2)/cos(kot1_rad) - sqrt((rx*cos(kot1_rad))**2 + (ry*sin(kot1_rad))**2)
+            y_središča_glave = y0 - (rx + širinaSlike/2 - x2)*tan(kot1_rad)
+            # draw.arc((širinaSlike/2 - polmer_glave, y_središča_glave - polmer_glave, širinaSlike/2 + polmer_glave, y_središča_glave + polmer_glave), 180 - kot1, kot1, fill=0, width=3)
+
+            # bunkica
+            višina_križa = 0.7*višinaSlike/10
+            širina_križa = 0.7*širinaSlike/10
+            # draw.ellipse((širinaSlike/2 - širina_križa/2, y_središča_glave - polmer_glave - višina_križa, širinaSlike/2 + širina_križa/2, y_središča_glave - polmer_glave), fill=(0, 0, 0), width=5)
+
+            # zgornje krivulje
+            # draw.arc((x1, y1 - višina_rect, x2, y2 - višina_rect), -kot1, 0, fill=0, width=3)
+            # draw.arc((širinaSlike - x2, y1 - višina_rect, širinaSlike - x1, y2 - višina_rect), 180, 180 + kot1, fill=0, width=3)
+            
+            # vmesni_člen
+            kok_gleda_ven = 0.7*širinaSlike/10
+            # draw.rectangle([(x2 - kok_gleda_ven, y0), (širinaSlike - (x2 - kok_gleda_ven), y0 + višina_rect)], outline=(0, 0, 0), width=3)
+
+            y0_ = y0 + višina_rect
+
+            # spodnje krivulje
+            kot2 = 50
+            kot2_rad = kot2*pi/180
+            # draw.arc((x1, y1, x2, y2), 0, kot2, fill=0, width=3)
+            # draw.arc((širinaSlike - x2, y1, širinaSlike - x1, y2), 180 - kot2, 180, fill=0, width=3)
+            """
+            
+            # podstavek
+            višina_podstavka = 0.8*višinaSlike/10
+            sp = y0_ + ry*sin(kot2_rad) + višina_podstavka
+            lv = x0 + rx*cos(kot2_rad)
+            kok_podstavek_ven_gleda = 0
+            draw.rectangle([(lv - kok_podstavek_ven_gleda, sp - višina_podstavka), (širinaSlike - lv + kok_podstavek_ven_gleda, sp)], outline=(0, 0, 0), width=3)
+            
+            # trebuh
+            ry_sl = 2*višinaSlike/5
+            kot_sl = 60
+            kot_sl_rad = kot_sl * pi/180
+            x_spodaj_levo = 3*širinaSlike/4
+            y_spodaj_levo = sp - višina_podstavka
+            rx_sl = x_spodaj_levo - lv
+            draw.arc((lv, y_spodaj_levo - ry_sl, lv + 2 * rx_sl, y_spodaj_levo + ry_sl), 180, 180 + kot_sl, fill=0, width=3)
+            
+            # griva
+            ry_sd = višinaSlike
+            kot_sd = 40
+            kot_sd_rad = kot_sd * pi/180
+            x_spodaj_desno = 1*širinaSlike/4
+            y_spodaj_desno = sp - višina_podstavka
+            lv_2 = lv + (širinaSlike - 2*lv)
+            rx_sd = lv_2 - x_spodaj_desno
+            draw.arc((lv_2 - 2* rx_sd, y_spodaj_desno - ry_sd, lv_2, y_spodaj_desno + ry_sd), -kot_sd, 0, fill=0, width=3)
+            
+            vrh_x = x_spodaj_desno + rx_sd*cos(kot_sd_rad)
+            vrh_y = y_spodaj_desno - ry_sd*sin(kot_sd_rad)
+
+            x_vrat = x_spodaj_levo - rx_sl*cos(kot_sl_rad)
+            y_vrat = y_spodaj_levo - ry_sl*sin(kot_sl_rad)
+
+            # podbradek
+            nov_x = širinaSlike/4
+            draw.line((x_vrat, y_vrat, nov_x, y_vrat), fill=0, width=3)
+
+            # obraz
+            nov_y = višinaSlike/4
+            draw.line((nov_x, y_vrat, nov_x, nov_y), fill=0, width=3)
+
+            # oko
+            oko_x = nov_x + 2*širinaSlike/10
+            oko_y = nov_y + 0.7*višinaSlike/10
+            polmer_očesa = 2
+            draw.ellipse((oko_x - polmer_očesa, oko_y - polmer_očesa, oko_x + polmer_očesa, oko_y + polmer_očesa), fill=0, outline=0)
+            
+            uho_x = širinaSlike/2
+            uho_y = nov_y
+            
+            # vrh glave
+            draw.line((nov_x, nov_y, uho_x, uho_y), fill=0, width=3)
+            draw.line((uho_x, uho_y, vrh_x, vrh_y), fill=0, width=3)
+
+            ime = "konj" + "_" + barveVImeBarve[ba]
+            shrani(ime, out)
+        elif be == "Konjica":
+            # podstavek
+            višina_podstavka = 0.8*višinaSlike/10
+            sp = y0_ + ry*sin(kot2_rad) + višina_podstavka
+            lv = x0 + rx*cos(kot2_rad)
+            kok_podstavek_ven_gleda = 0
+            draw.rectangle([(lv - kok_podstavek_ven_gleda, sp - višina_podstavka), (širinaSlike - lv + kok_podstavek_ven_gleda, sp)], outline=(0, 0, 0), width=3)
+            
+            # trebuh
+            ry_sl = 2*višinaSlike/5
+            kot_sl = 60
+            kot_sl_rad = kot_sl * pi/180
+            x_spodaj_levo = 3*širinaSlike/4
+            y_spodaj_levo = sp - višina_podstavka
+            rx_sl = x_spodaj_levo - lv
+            draw.arc((lv, y_spodaj_levo - ry_sl, lv + 2 * rx_sl, y_spodaj_levo + ry_sl), 180, 180 + kot_sl, fill=0, width=3)
+            
+            # griva
+            ry_sd = višinaSlike
+            kot_sd = 40
+            kot_sd_rad = kot_sd * pi/180
+            x_spodaj_desno = 1*širinaSlike/4
+            y_spodaj_desno = sp - višina_podstavka
+            lv_2 = lv + (širinaSlike - 2*lv)
+            rx_sd = lv_2 - x_spodaj_desno
+            draw.arc((lv_2 - 2* rx_sd, y_spodaj_desno - ry_sd, lv_2, y_spodaj_desno + ry_sd), -kot_sd, 0, fill=0, width=3)
+            
+            vrh_x = x_spodaj_desno + rx_sd*cos(kot_sd_rad)
+            vrh_y = y_spodaj_desno - ry_sd*sin(kot_sd_rad)
+
+            x_vrat = x_spodaj_levo - rx_sl*cos(kot_sl_rad)
+            y_vrat = y_spodaj_levo - ry_sl*sin(kot_sl_rad)
+
+            # podbradek
+            nov_x = širinaSlike/4
+            draw.line((x_vrat, y_vrat, nov_x, y_vrat), fill=0, width=3)
+
+            # obraz
+            nov_y = višinaSlike/4
+            draw.line((nov_x, y_vrat, nov_x, nov_y), fill=0, width=3)
+
+            # oko
+            oko_x = nov_x + 2*širinaSlike/10
+            oko_y = nov_y + 0.7*višinaSlike/10
+            polmer_očesa = 2
+            draw.ellipse((oko_x - polmer_očesa, oko_y - polmer_očesa, oko_x + polmer_očesa, oko_y + polmer_očesa), fill=0, outline=0)
+            
+            uho_x = širinaSlike/2
+            uho_y = nov_y
+            
+            # vrh glave
+            draw.line((nov_x, nov_y, uho_x, uho_y), fill=0, width=3)
+            draw.line((uho_x, uho_y, vrh_x, vrh_y), fill=0, width=3)
+            višina_krone = višinaSlike/10
+            krona(nov_x + širinaSlike/10, nov_y - višina_krone, nov_x + 2*širinaSlike/10, nov_y, 3, 0.3*višina_krone)
+
+            ime = "konjica" + "_" + barveVImeBarve[ba]
+            shrani(ime, out)
+
 
 # zid (skala)
 out = Image.new("RGBA", (100, 100), (255, 255, 255, 0))
 draw = ImageDraw.Draw(out, mode="RGBA")
 
-širinaTeksta, višinaTeksta = draw.textsize("Zid", font=unicode_font)
+# širinaTeksta, višinaTeksta = draw.textsize("Zid", font=unicode_font)
 
+"""
 koordinate = (
     (širinaSlike - širinaTeksta)/2,
     (višinaSlike - višinaTeksta)/2
 )
+"""
 
-napiši(draw, "Zid", (0, 0, 0), koordinate)
+# napiši(draw, "Zid", (0, 0, 0), koordinate)
+
+draw.rectangle((0, 0, širinaSlike, višinaSlike), fill=(0, 0, 0))
+
 ime = "skala"
 shrani(ime, out)
 
