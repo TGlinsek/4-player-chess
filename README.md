@@ -1,7 +1,7 @@
 # (🇸🇮) Štiriigralski šah:
 Ta projekt je povzet po https://www.chess.com/4-player-chess.
 
-Zaenkrat se še ne da normalno igrati; lahko samo singleplayer proti samemu sebi. Pa tut lepo ne zgleda.
+Zaenkrat se še ne da normalno igrati; lahko samo singleplayer proti samemu sebi. Pa tut figure bi še lahko zgledale lepše.
 
 ## Kako igrati
 
@@ -21,7 +21,7 @@ Enočrkovne oznake (za primer, da se slike ne naložijo):
 Opomba: konjica = konj + kraljica
 
 ## Todo
-- [ ] Dodaj slike
+- [x] Dodal slike
 - [ ] Dimenzije šahovnice so v redu na različnih ekranih
 - [ ] Možnost multiplayerja
 
