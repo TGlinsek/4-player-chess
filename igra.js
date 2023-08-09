@@ -98,6 +98,13 @@ var Igra = function(plošča) {
         4 : "W"
     }
 
+    this.barva = {
+        1 : "modri",
+        2 : "rumeni",
+        3 : "zeleni",
+        4 : "rdeči"
+    }
+
     this.smerniVektorji = {
         "N" : [0, -1],
         "S" : [0, 1],
@@ -362,6 +369,7 @@ var Igra = function(plošča) {
     }
 
     this.poljeJeNapadenoPrekoKmetaSStraniNapadalca = function(x, y, napadalec) {
+        // TODO: preveri, ali to vključuje napadanje preko en passanta. Mislim, da nima veze, ker so tukaj tako ali tako ne gleda
         /*
         var sez = this.poljeJeNapadenoPrekoKmeta(x, y, igralec);
         var novSez = [];
@@ -413,17 +421,41 @@ var Igra = function(plošča) {
                 (1, 1) -> (0, 1)
                 (-1, -1) -> (0, -1)
                 */
-                var meja = this.vrniPolje(x + i_, y + j_);
-                if (["EE", "XX"].includes(meja)) {
+                enKorak:
+                {
+                    var meja = this.vrniPolje(x + i_, y + j_);
+                    if (["EE", "XX"].includes(meja)) {
+                        break enKorak;
+                    }
+                    if (meja[1] != String(napadalec)) {
+                        break enKorak;
+                    }
+                    var smer = this.smeri[parseInt(meja[1])];
+                    if (meja[0] == "P" && seznamaStaEnaka([-i_, -j_], this.smerniVektorji[smer])) {
+                        // return [true, [x + i_, y + j_]];
+                        seznamNapadalcev.push([x + i_, y + j_]);
+                    }
+                }
+                
+                // poskrbimo še za kmete, ki lahko grejo za dve naprej
+                // torej, preveriti moramo, ali se lahko na polje (x, y) postavi kak kmet igralca "napadalec", tako da se premakne za dve
+                var meja2 = this.vrniPolje(x + 2*i_, y + 2*j_);
+                if (!this.poljeJeTakšnoDaLahkoKmetiGrejoZaDvaNaprej(x + 2*i_, y + 2*j_, meja2[1])) {
                     continue;
                 }
-                if (meja[1] != String(napadalec)) {
+                if (meja != "EE") {
                     continue;
                 }
-                var smer = this.smeri[parseInt(meja[1])];
-                if (meja[0] == "P" && seznamaStaEnaka([-i_, -j_], this.smerniVektorji[smer])) {
+                if (["EE", "XX"].includes(meja2)) {
+                    continue;
+                }
+                if (meja2[1] != String(napadalec)) {
+                    continue;
+                }
+                var smer = this.smeri[parseInt(meja2[1])];
+                if (meja2[0] == "P" && seznamaStaEnaka([-i_, -j_], this.smerniVektorji[smer])) {
                     // return [true, [x + i_, y + j_]];
-                    seznamNapadalcev.push([x + i_, y + j_]);
+                    seznamNapadalcev.push([x + 2*i_, y + 2*j_]);
                 }
             }
         }
@@ -545,7 +577,7 @@ var Igra = function(plošča) {
         // predpostavljamo, da (x2, y2) ni zasedeno s prijateljsko figuro oz. s skalo, in da na (x1, y1) res kmet, in to ustreznega igralca. Tega ne bomo preverjali posebej
         var smer = this.smerniVektorji[this.smeri[lastnikKmeta]];  // tuki dejansko ne rabimo zamenjat this.igralecNaVrsti z neNasprotnik, ampak ni važno
         if (x2 == 5 && y2 == 11) {
-            console.log(seznamVsebuje(this.vrniVseEnPassanteOdNasprotnikov(lastnikKmeta), [x2, y2]));
+            // console.log(seznamVsebuje(this.vrniVseEnPassanteOdNasprotnikov(lastnikKmeta), [x2, y2]));
         }
         return potezaKmetaVeljavna(x2 - x1, y2 - y1, smer, cilj != "EE" || seznamVsebuje(this.vrniVseEnPassanteOdNasprotnikov(lastnikKmeta), [x2, y2]), 
             this.poljeJeTakšnoDaLahkoKmetiGrejoZaDvaNaprej(x1, y1, lastnikKmeta) && // ali je polje ustrezno za kmetov dvojni korak naprej
@@ -666,7 +698,7 @@ var Igra = function(plošča) {
                             if (koordinateNasprotnikov.length == 0) {
                                 continue zankaČezVseIgralce;  // pol itak ni šah
                             }
-                            console.log("Šah je za igralca " + this.vrstniRedIgralcev[k]);
+                            console.log("Šah je za igralca " + this.vrstniRedIgralcev[k] + " (" + this.barva[this.vrstniRedIgralcev[k]] +")");
                             if (koordinateNasprotnikov.length >= 2) {  // če sta napadalca vsaj dva, potem se šaha ne moremo znebiti s tem, da le nastavimo kako od svojih figur. V tem primeru torej ne potrebujemo nobenih simulacij
                                 break preprečevanjeŠaha;
                             }
@@ -765,10 +797,10 @@ var Igra = function(plošča) {
                         */
 
                         
-                        for (var k = -1; k <= 1; k++) {
+                        for (var k2 = -1; k2 <= 1; k2++) {
                             for (var l = -1; l <= 1; l++) {
-                                if (k != 0 || l != 0) {
-                                    if (this.premikJeMožen(j, i, j + k, i + l, igralec, [j, i])) {
+                                if (k2 != 0 || l != 0) {
+                                    if (this.premikJeMožen(j, i, j + k2, i + l, igralec, [j, i])) {
                                         continue zankaČezVseIgralce;
                                     }
                                 }
@@ -779,7 +811,7 @@ var Igra = function(plošča) {
                 }
             }
             this.prviPoraženec = this.vrstniRedIgralcev[k];
-            console.log("Igralec " + this.prviPoraženec + " je prvi izgubil!.");
+            console.log("Igralec " + this.prviPoraženec + " (" + this.barva[this.prviPoraženec] +")" + " je prvi izgubil!.");
             return;
         }
     }
